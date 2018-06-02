@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Филипп Ефимов](https://up.htmlacademy.ru/javascript/14/user/417817).
-* Наставник: `Неизвестно`.
+* Наставник: `Сергей Буртылёв`.
 
 ---
 
