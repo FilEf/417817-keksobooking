@@ -136,7 +136,7 @@ function makePin(arrayObject) {
   return pin;
 }
 
-// функция создания массива указателей и добавиления их в DOM
+// функция создания массива указателей
 function makePins(array) {
   var fragment = document.createDocumentFragment();
   for (var i = 0; i < array.length; i++) {
@@ -145,7 +145,7 @@ function makePins(array) {
   return fragment;
 }
 
-// функция создания объявления и добавления его в DOM
+// функция создания объявления
 var offerTemplate = document.querySelector('template').content.querySelector('.map__card');
 var offerContainer = document.querySelector('.map');
 
