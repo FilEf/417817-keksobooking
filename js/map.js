@@ -1,6 +1,5 @@
 'use strict';
 
-var objectArray = [];
 // аватарка
 var PHOTO_QUANTITY = 8;
 var PHOTO_NAME_ARRAY = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -50,69 +49,68 @@ var MAX_Y = 630;
 var PIN_WIDTH = 50;
 var PIN_HEIGHT = 70;
 
+var objectArray = [];
+
 // функция-генератор случайных чисел
 function getRandNum(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// функция создания массива координат
-function getLocationArray() {
-  var locationArray = new Array(2);
-  locationArray[0] = getRandNum(MIN_X, MAX_X);
-  locationArray[1] = getRandNum(MIN_Y, MAX_Y);
-  return locationArray;
-}
-
-// функция сравнения элементов
-function compareArray(y) {
+// функция сравнения элементов массива
+function compareArrayObjects(y) {
   return function (x) {
     return y === x;
   };
 }
 
-// функция для формирования массива произвольной/непроизвольной длины с элементами в произвольном/непроизвольном порядке
-function getRandArray(array, randOrder, randLength) {
-  var IterationQuantity = randLength ? getRandNum(1, array.length) : array.length;
-  var resultArray = new Array(IterationQuantity);
-  for (var i = 0; i < IterationQuantity; i++) {
-    if (!randOrder) {
-      resultArray[i] = array[i];
+// функция получения рандомного элемента массива
+function getRandElement(array) {
+  return array[getRandNum(0, array.length - 1)];
+}
+
+// функция перемешивания массива
+function getShuffledArray(array) {
+  var resultArray = [];
+  for (var i = 0; i < array.length; i++) {
+    var randArrayElement = getRandElement(array);
+    if (!resultArray.some(compareArrayObjects(randArrayElement))) {
+      resultArray[i] = randArrayElement;
     } else {
-      var randArrayElement = getRandNum(0, IterationQuantity - 1);
-      if (!resultArray.some(compareArray(array[randArrayElement]))) {
-        resultArray[i] = array[randArrayElement];
-      } else {
-        i--;
-      }
+      i--;
     }
   }
   return resultArray;
 }
 
+// функция обрезания массива на рандомную длину
+function getRandCutAray(array) {
+  return getShuffledArray(array).slice(0, getRandNum(1, array.length - 1));
+}
+
 // функция для заполнения свойств объекта
 function makeObjectArray() {
   for (var i = 0; i < PHOTO_QUANTITY; i++) {
-    var x = getLocationArray()[0];
-    var y = getLocationArray()[1];
+    var x = getRandNum(MIN_X, MAX_X);
+    var y = getRandNum(MIN_Y, MAX_Y);
     objectArray[i] =
       {
         author:
           {
-            avatar: 'img/avatars/user0' + getRandArray(PHOTO_NAME_ARRAY, 1, 0)[i] + '.png'
+            avatar: 'img/avatars/user0' + getRandElement(PHOTO_NAME_ARRAY) + '.png'
           },
         offer:
           {
-            title: getRandArray(TITLE_ARRAY, 1, 0)[i],
+            title: getRandElement(TITLE_ARRAY),
             address: x + ', ' + y,
             price: getRandNum(MIN_PRICE, MAX_PRICE),
-            type: TYPE_RUS[(getRandArray(TYPE_ARRAY, 1, 0)[i])],
+            type: TYPE_RUS[getRandElement(TYPE_ARRAY)],
             rooms: getRandNum(1, MAX_ROOMS),
             guests: getRandNum(1, MAX_GUESTS),
-            checkin: CHECKIN_ARRAY[getRandNum(0, CHECKIN_ARRAY.length - 1)],
-            checkout: CHECKOUT_ARRAY[getRandNum(0, CHECKOUT_ARRAY.length - 1)],
-            features: getRandArray(FEATURES_ARRAY, 0, 1),
+            checkin: getRandElement(CHECKIN_ARRAY),
+            checkout: getRandElement(CHECKOUT_ARRAY),
+            features: getRandCutAray(FEATURES_ARRAY),
             description: '',
-            photos: getRandArray(PHOTOS_ARRAY, 1, 0)
+            photos: getShuffledArray(PHOTOS_ARRAY)
           },
         location:
           {
@@ -131,7 +129,7 @@ var offerArray = makeObjectArray();
 
 function makePin(arrayObject) {
   var pin = mapPinTemplate.cloneNode(true);
-  pin.style.left = (arrayObject.location.x - (PIN_WIDTH / 2)) + 'px';
+  pin.style.left = arrayObject.location.x - PIN_WIDTH / 2 + 'px';
   pin.style.top = arrayObject.location.y - PIN_HEIGHT + 'px';
   pin.querySelector('img').src = arrayObject.author.avatar;
   pin.querySelector('img').alt = arrayObject.offer.title;
@@ -144,7 +142,7 @@ function makePins(array) {
   for (var i = 0; i < array.length; i++) {
     fragment.appendChild(makePin(array[i]));
   }
-  mapPinsContainer.appendChild(fragment);
+  return fragment;
 }
 
 // функция создания объявления и добавления его в DOM
@@ -179,12 +177,17 @@ function makeOffer(arrayObject) {
     img.alt = 'Фотография жилья';
     photoContainer.appendChild(img);
   });
-  offerContainer.appendChild(offer);
+  return offer;
+}
+
+// функция добавления элементов в DOM
+function insertIntoDom(container, element) {
+  container.appendChild(element);
 }
 
 var map = document.querySelector('.map');
 map.classList.remove('map--faded');
 
-makePins(offerArray);
-makeOffer(offerArray[0]);
+insertIntoDom(mapPinsContainer, makePins(offerArray));
+insertIntoDom(offerContainer, makeOffer(offerArray[0]));
 
