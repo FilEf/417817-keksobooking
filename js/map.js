@@ -83,7 +83,7 @@ function getShuffledArray(array) {
 }
 
 // функция обрезания массива на рандомную длину
-function getRandCutAray(array) {
+function getRandCutArray(array) {
   return getShuffledArray(array).slice(0, getRandNum(1, array.length - 1));
 }
 
@@ -108,7 +108,7 @@ function makeObjectArray() {
             guests: getRandNum(1, MAX_GUESTS),
             checkin: getRandElement(CHECKIN_ARRAY),
             checkout: getRandElement(CHECKOUT_ARRAY),
-            features: getRandCutAray(FEATURES_ARRAY),
+            features: getRandCutArray(FEATURES_ARRAY),
             description: '',
             photos: getShuffledArray(PHOTOS_ARRAY)
           },
@@ -122,10 +122,9 @@ function makeObjectArray() {
   return objectArray;
 }
 
-// функция создание указателя
+// функция создания указателя
 var mapPinTemplate = document.querySelector('template').content.querySelector('.map__pin');
 var mapPinsContainer = document.querySelector('.map__pins');
-var offerArray = makeObjectArray();
 
 function makePin(arrayObject) {
   var pin = mapPinTemplate.cloneNode(true);
@@ -136,13 +135,44 @@ function makePin(arrayObject) {
   return pin;
 }
 
-// функция создания массива указателей
-function makePins(array) {
-  var fragment = document.createDocumentFragment();
+// функция создания фрагмента с указателями
+function makePinsFragment(array) {
+  var PinsFragment = document.createDocumentFragment();
   for (var i = 0; i < array.length; i++) {
-    fragment.appendChild(makePin(array[i]));
+    PinsFragment.appendChild(makePin(array[i]));
   }
-  return fragment;
+  return PinsFragment;
+}
+
+// функция создания фрагмента со списком удобств
+function makeFeaturesFragment(array) {
+  var featuresFragment = document.createDocumentFragment();
+  for (var i = 0; i < array.length; i++) {
+    var li = document.createElement('li');
+    li.className = 'popup__feature popup__feature--' + array[i];
+    featuresFragment.appendChild(li);
+  }
+  return featuresFragment;
+}
+
+// функция создания фрагмента с фотографиями жилья
+function makePhotosFragment(array) {
+  var photosFragment = document.createDocumentFragment();
+  for (var i = 0; i < array.length; i++) {
+    var img = document.createElement('img');
+    img.src = array[i];
+    img.className = '.popup__photo';
+    img.width = PHOTO_WIDTH;
+    img.height = PHOTO_HEIGHT;
+    img.alt = 'Фотография жилья';
+    photosFragment.appendChild(img);
+  }
+  return photosFragment;
+}
+
+// функция добавления элементов в DOM
+function insertIntoDom(container, element) {
+  container.appendChild(element);
 }
 
 // функция создания объявления
@@ -163,31 +193,15 @@ function makeOffer(arrayObject) {
   offer.querySelector('.popup__avatar').src = arrayObject.author.avatar;
   offer.querySelector('.popup__features').innerHTML = '';
   offer.querySelector('.popup__photos').innerHTML = '';
-  arrayObject.offer.features.forEach(function (feature) {
-    var li = document.createElement('li');
-    li.className = 'popup__feature popup__feature--' + feature;
-    ulContainer.appendChild(li);
-  });
-  arrayObject.offer.photos.forEach(function (photo) {
-    var img = document.createElement('img');
-    img.src = photo;
-    img.class = '.popup__photo';
-    img.width = PHOTO_WIDTH;
-    img.height = PHOTO_HEIGHT;
-    img.alt = 'Фотография жилья';
-    photoContainer.appendChild(img);
-  });
+  insertIntoDom(ulContainer, makeFeaturesFragment(arrayObject.offer.features));
+  insertIntoDom(photoContainer, makePhotosFragment(arrayObject.offer.photos));
   return offer;
-}
-
-// функция добавления элементов в DOM
-function insertIntoDom(container, element) {
-  container.appendChild(element);
 }
 
 var map = document.querySelector('.map');
 map.classList.remove('map--faded');
 
-insertIntoDom(mapPinsContainer, makePins(offerArray));
+var offerArray = makeObjectArray();
+insertIntoDom(mapPinsContainer, makePinsFragment(offerArray));
 insertIntoDom(offerContainer, makeOffer(offerArray[0]));
 
