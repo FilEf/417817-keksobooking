@@ -198,10 +198,47 @@ function makeOffer(arrayObject) {
   return offer;
 }
 
-var map = document.querySelector('.map');
-map.classList.remove('map--faded');
+/* module4-task1 */
+
+
+var mainPin = document.querySelector('.map__pin--main');
+var MAIN_PIN_WIDTH = mainPin.clientWidth;
+var MAIN_PIN_HEIGHT = mainPin.clientHeight + 22;
+var START_PIN_X = mainPin.offsetLeft + MAIN_PIN_WIDTH / 2;
+var START_PIN_Y = mainPin.offsetTop + MAIN_PIN_HEIGHT;
+
 
 var offerArray = makeObjectArray();
-insertIntoDom(mapPinsContainer, makePinsFragment(offerArray));
-insertIntoDom(offerContainer, makeOffer(offerArray[0]));
+var map = document.querySelector('.map');
+var adForm = document.querySelector('.ad-form');
+var adFormFieldset = adForm.querySelectorAll('fieldset');
+
+// функция блокировки формы
+function setFormDisabled() {
+  for (var i = 0; i < adFormFieldset.length; i++) {
+    adFormFieldset[i].setAttribute('disabled', '');
+  }
+}
+
+// функция вставки значения в поле адреса
+function inputAddress(x, y) {
+  document.getElementById('address').value = x + ',' + y;
+}
+
+// функция разблокировки карты и формы и отображения указателей
+function setAllEnabled() {
+  map.classList.remove('map--faded');
+  adForm.classList.remove('ad-form--disabled');
+  inputAddress(START_PIN_X, START_PIN_Y);
+  insertIntoDom(mapPinsContainer, makePinsFragment(offerArray));
+  insertIntoDom(offerContainer, makeOffer(offerArray[0]));
+  for (var i = 0; i < adFormFieldset.length; i++) {
+    adFormFieldset[i].removeAttribute('disabled');
+  }
+}
+
+var mapPin = document.querySelector('.map__pin--main');
+mapPin.addEventListener('mouseup', setAllEnabled);
+
+
 
