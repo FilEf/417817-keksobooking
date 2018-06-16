@@ -126,10 +126,11 @@ function makeObjectArray() {
 var mapPinTemplate = document.querySelector('template').content.querySelector('.map__pin');
 var mapPinsContainer = document.querySelector('.map__pins');
 
-function makePin(arrayObject) {
+function makePin(arrayObject, i) {
   var pin = mapPinTemplate.cloneNode(true);
   pin.style.left = arrayObject.location.x - PIN_WIDTH / 2 + 'px';
   pin.style.top = arrayObject.location.y - PIN_HEIGHT + 'px';
+  pin.id = 'pin' + i;
   pin.querySelector('img').src = arrayObject.author.avatar;
   pin.querySelector('img').alt = arrayObject.offer.title;
   return pin;
@@ -139,7 +140,7 @@ function makePin(arrayObject) {
 function makePinsFragment(array) {
   var PinsFragment = document.createDocumentFragment();
   for (var i = 0; i < array.length; i++) {
-    PinsFragment.appendChild(makePin(array[i]));
+    PinsFragment.appendChild(makePin(array[i], i));
   }
   return PinsFragment;
 }
@@ -200,18 +201,31 @@ function makeOffer(arrayObject) {
 
 /* module4-task1 */
 
-
-var mainPin = document.querySelector('.map__pin--main');
-var MAIN_PIN_WIDTH = mainPin.clientWidth;
-var MAIN_PIN_HEIGHT = mainPin.clientHeight + 22;
-var START_PIN_X = mainPin.offsetLeft + MAIN_PIN_WIDTH / 2;
-var START_PIN_Y = mainPin.offsetTop + MAIN_PIN_HEIGHT;
+var mapPinMain = document.querySelector('.map__pin--main');
+var MAIN_PIN_WIDTH = mapPinMain.clientWidth;
+var MAIN_PIN_HEIGHT = mapPinMain.clientHeight + 22;
+var START_PIN_X = mapPinMain.offsetLeft + MAIN_PIN_WIDTH / 2;
+var START_PIN_Y = mapPinMain.offsetTop + MAIN_PIN_HEIGHT;
 
 
 var offerArray = makeObjectArray();
 var map = document.querySelector('.map');
 var adForm = document.querySelector('.ad-form');
 var adFormFieldset = adForm.querySelectorAll('fieldset');
+
+// функция разблокировки карты
+function setMapEnabled() {
+  if (document.querySelector('.map--faded')) {
+    map.classList.remove('map--faded');
+  }
+}
+
+// функция разблокировки формы
+function setFormEnabled() {
+  if (document.querySelector('.ad-form--disabled')) {
+    adForm.classList.remove('ad-form--disabled');
+  }
+}
 
 // функция блокировки формы
 function setFormDisabled() {
@@ -222,23 +236,25 @@ function setFormDisabled() {
 
 // функция вставки значения в поле адреса
 function inputAddress(x, y) {
-  document.getElementById('address').value = x + ',' + y;
+  document.getElementById('address').value = x + ', ' + y;
 }
 
-// функция разблокировки карты и формы и отображения указателей
+// функция для запуска разблокировки страницы
 function setAllEnabled() {
-  map.classList.remove('map--faded');
-  adForm.classList.remove('ad-form--disabled');
+  setMapEnabled();
+  setFormEnabled();
   inputAddress(START_PIN_X, START_PIN_Y);
   insertIntoDom(mapPinsContainer, makePinsFragment(offerArray));
-  insertIntoDom(offerContainer, makeOffer(offerArray[0]));
+  /*insertIntoDom(offerContainer, makeOffer(offerArray[0]));*/
   for (var i = 0; i < adFormFieldset.length; i++) {
     adFormFieldset[i].removeAttribute('disabled');
   }
 }
 
-var mapPin = document.querySelector('.map__pin--main');
-mapPin.addEventListener('mouseup', setAllEnabled);
+mapPinMain.addEventListener('mouseup', setAllEnabled);
+mapPinsContainer.addEventListener('mouseup', console.log);
+
+setFormDisabled();
 
 
 
