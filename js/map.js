@@ -130,7 +130,7 @@ function makePin(arrayObject, i) {
   var pin = mapPinTemplate.cloneNode(true);
   pin.style.left = arrayObject.location.x - PIN_WIDTH / 2 + 'px';
   pin.style.top = arrayObject.location.y - PIN_HEIGHT + 'px';
-  pin.id = 'pin' + i;
+  pin.dataset.id = i;
   pin.querySelector('img').src = arrayObject.author.avatar;
   pin.querySelector('img').alt = arrayObject.offer.title;
   return pin;
@@ -276,19 +276,22 @@ function removeOfferCloseEvtListeners() {
   document.removeEventListener('keydown', escPressHandler);
 }
 
-// функция обработки события нажатия на кнопку закрыть
-function closeBtnPressHandler() {
+// функция закрытия подробной информации
+function closeOffer() {
   deleteOfferFromDom();
   removeOfferCloseEvtListeners();
   currentOffer = null;
 }
 
+// функция обработки события нажатия на кнопку закрыть
+function closeBtnPressHandler() {
+  closeOffer();
+}
+
 // функция обработки события нажатия на escape
 function escPressHandler(evt) {
   if (evt.keyCode === ESC_CODE) {
-    deleteOfferFromDom();
-    removeOfferCloseEvtListeners();
-    currentOffer = null;
+    closeOffer();
   }
 }
 
@@ -319,22 +322,99 @@ var TYPE_MINPRICE = {
   'palace': 10000
 };
 
+var ROOMS_CAPACITY = {
+  1: 1,
+  2: 2,
+  3: 3,
+  100: 0
+};
+
 var priceInput = adForm.querySelector('#price');
 var typeInput = adForm.querySelector('#type');
+var timein = adForm.querySelector('#timein');
+var timeout = adForm.querySelector('#timeout');
+var roomNumber = adForm.querySelector('#room_number');
+var capacity = adForm.querySelector('#capacity');
+var timeinValues = timein.querySelectorAll('option');
+var timeoutValues = timeout.querySelectorAll('option');
+var capacityValues = capacity.querySelectorAll('option');
+
 
 // функция, возвращающая мин. цену в зависимости от типа жилья
 function getMinPriceByType(type) {
   return TYPE_MINPRICE[type];
 }
 
-// функция замены placeholder и минимального значения в зависимости от типа жилья
-function setPlaceholderByType(evt) {
+// функция обработки события смены типа жилья
+function typeInputChangeHandler(evt) {
   var price = getMinPriceByType(evt.target.value);
   priceInput.setAttribute('placeholder', price);
   priceInput.setAttribute('min', price);
 }
 
-// функция синхронизации времени заезда и выезда
+// функция удаления selected у значений из списка
+function removeAttributeSelected(list) {
+  for (var i = 0; i < list.length; i++) {
+    list[i].removeAttribute('selected');
+  }
+}
 
-typeInput.addEventListener('change', setPlaceholderByType);
+// функция синхронизации времени выезда по времени заезда
+function timeinInputChangeHandler(evt) {
+  var timeoutIndex = evt.target.options.selectedIndex;
+  removeAttributeSelected(timeoutValues);
+  timeout[timeoutIndex].selected = true;
+}
+
+// функция синхронизации времени выезда по времени заезда
+function timeoutInputChangeHandler(evt) {
+  var timeinIndex = evt.target.options.selectedIndex;
+  removeAttributeSelected(timeinValues);
+  timein[timeinIndex].selected = true;
+}
+
+// функция поиска индекса первого валидного значения из списка
+function findFirstValidValue() {
+  var i = 0;
+  while (i < capacityValues.length && capacity[i].disabled === true) {
+    i++;
+  }
+  return i;
+}
+
+// функция проставления disabled у невалидных значений
+function setDisabledCapacityByRoomNumbers(value) {
+  if (value !== 0) {
+    for (var i = 0; i < capacityValues.length; i++) {
+      capacityValues[i].disabled = capacityValues[i].value === '0' || capacityValues[i].value > value ? true : false;
+    }
+  } else {
+    for (var j = 0; j < capacityValues.length; j++) {
+      capacityValues[j].disabled = capacityValues[j].value !== value.toString() ? true : false;
+    }
+  }
+}
+
+// функция, возвращающая кол-во мест в зависимости от кол-ва комнат
+function getCapacityByRoomNumber(number) {
+  return ROOMS_CAPACITY[number];
+}
+
+
+// функция синхронизации кол-ва комнат с кол-вом мест
+function roomNumberChangeHandler(evt) {
+  var capacityValue = getCapacityByRoomNumber(evt.target.value);
+  setDisabledCapacityByRoomNumbers(capacityValue);
+  capacity[findFirstValidValue()].selected = true;
+}
+
+// функция запуска обработчиков событий на форме
+function addFormListeners() {
+  typeInput.addEventListener('change', typeInputChangeHandler);
+  timein.addEventListener('change', timeinInputChangeHandler);
+  timeout.addEventListener('change', timeoutInputChangeHandler);
+  roomNumber.addEventListener('change', roomNumberChangeHandler);
+}
+
+addFormListeners();
 
