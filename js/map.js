@@ -236,6 +236,7 @@ function setFormEnabled() {
 function setFormDisabled() {
   for (var i = 0; i < adFormFieldset.length; i++) {
     adFormFieldset[i].setAttribute('disabled', '');
+    inputAddress();
   }
 }
 
