@@ -130,7 +130,7 @@ function makePin(arrayObject, i) {
   var pin = mapPinTemplate.cloneNode(true);
   pin.style.left = arrayObject.location.x - PIN_WIDTH / 2 + 'px';
   pin.style.top = arrayObject.location.y - PIN_HEIGHT + 'px';
-  pin.id = 'pin' + i;
+  pin.dataset.id = i;
   pin.querySelector('img').src = arrayObject.author.avatar;
   pin.querySelector('img').alt = arrayObject.offer.title;
   return pin;
@@ -205,118 +205,102 @@ var MAIN_PIN_WIDTH = 65;
 var MAIN_PIN_HEIGHT = 65 + 22;
 var ESC_CODE = 27;
 
-var offerArray = makeObjectArray();
+var mapOffers = makeObjectArray();
 var map = document.querySelector('.map');
 var mapPinMain = document.querySelector('.map__pin--main');
-var notice = document.querySelector('.notice');
 var adForm = document.querySelector('.ad-form');
-var adFormFieldset = adForm.querySelectorAll('fieldset');
-var curOffer;
+var adFormFieldsets = adForm.querySelectorAll('fieldset');
+var addressField = adForm.querySelector('#address');
+var currentOffer;
+var mainPinStartX = mapPinMain.offsetLeft + MAIN_PIN_WIDTH / 2;
+var mainPinStartY = mapPinMain.offsetTop + MAIN_PIN_HEIGHT;
+
+// функция разблокировки формы
+function setFormEnabled() {
+  adForm.classList.remove('ad-form--disabled');
+  for (var i = 0; i < adFormFieldsets.length; i++) {
+    adFormFieldsets[i].removeAttribute('disabled');
+  }
+}
+
+
+// функция блокировки формы
+function setFormDisabled() {
+  adForm.classList.add('ad-form--disabled');
+  for (var i = 0; i < adFormFieldsets.length; i++) {
+    adFormFieldsets[i].setAttribute('disabled', '');
+  }
+}
 
 // функция проверки состояния карты
-function returnMapStatus() {
+function isMapFaded() {
   return map.classList.contains('map--faded');
 }
 
 // функция разблокировки карты
 function setMapEnabled() {
-  if (returnMapStatus()) {
-    map.classList.remove('map--faded');
-  }
-}
-
-// функция разблокировки формы
-function setFormEnabled() {
-  if (notice.querySelector('.ad-form--disabled')) {
-    adForm.classList.remove('ad-form--disabled');
-  }
-}
-
-// функция блокировки формы
-function setFormDisabled() {
-  for (var i = 0; i < adFormFieldset.length; i++) {
-    adFormFieldset[i].setAttribute('disabled', '');
-    inputAddress();
-  }
+  map.classList.remove('map--faded');
+  setFormEnabled();
 }
 
 // функция вставки значения в поле адреса
-function inputAddress() {
-  var startX = mapPinMain.offsetLeft + MAIN_PIN_WIDTH / 2;
-  var startY = mapPinMain.offsetTop + MAIN_PIN_HEIGHT;
-  document.getElementById('address').value = startX + ', ' + startY;
+function inputAddress(x, y) {
+  addressField.value = x + ', ' + y;
 }
 
 // функция запуска разблокировки страницы по нажатию на главный указатель
 function mainPinMouseupHandler() {
-  if (returnMapStatus()) {
+  if (isMapFaded()) {
     setMapEnabled();
-    setFormEnabled();
-    inputAddress();
-    insertIntoDom(mapPinsContainer, makePinsFragment(offerArray));
-    for (var i = 0; i < adFormFieldset.length; i++) {
-      adFormFieldset[i].removeAttribute('disabled');
-    }
+    inputAddress(mainPinStartX, mainPinStartY);
+    insertIntoDom(mapPinsContainer, makePinsFragment(mapOffers));
   }
-}
-
-// функция получения id нажатого указателя
-function getPinId(evt) {
-  var target = evt.target;
-  var id;
-  while (target !== mapPinsContainer) {
-    if (target.classList.contains('map__pin')) {
-      id = target.id.slice(3);
-      return id;
-    } else {
-      target = target.parentNode;
-    }
-  }
-  return id;
 }
 
 // функция удаления предложения из DOM
-function deleteOfferFromDom(offer) {
-  if (offer) {
-    offer.parentNode.removeChild(offer);
+function deleteOfferFromDom() {
+  if (currentOffer) {
+    currentOffer.remove();
   }
 }
 
 // функция запуска обработчиков событий для закрытия текущего предложения
-function addOfferCloseEvtListeners(offer) {
-  offer.querySelector('.popup__close').addEventListener('click', closeBtnPressHandler);
+function addOfferCloseEvtListeners() {
+  currentOffer.querySelector('.popup__close').addEventListener('click', closeBtnPressHandler);
   document.addEventListener('keydown', escPressHandler);
 }
 
 // функция удаления обработчиков событий при закрытии текущего предложения
-function removeOfferCloseEvtListeners(offer) {
-  offer.querySelector('.popup__close').removeEventListener('click', closeBtnPressHandler);
+function removeOfferCloseEvtListeners() {
+  currentOffer.querySelector('.popup__close').removeEventListener('click', closeBtnPressHandler);
   document.removeEventListener('keydown', escPressHandler);
 }
 
 // функция обработки события нажатия на кнопку закрыть
 function closeBtnPressHandler() {
-  deleteOfferFromDom(curOffer);
-  removeOfferCloseEvtListeners(curOffer);
-  curOffer = null;
+  deleteOfferFromDom();
+  removeOfferCloseEvtListeners();
+  currentOffer = null;
 }
 
 // функция обработки события нажатия на escape
 function escPressHandler(evt) {
   if (evt.keyCode === ESC_CODE) {
-    deleteOfferFromDom(curOffer);
-    curOffer = null;
+    deleteOfferFromDom();
+    removeOfferCloseEvtListeners();
+    currentOffer = null;
   }
 }
 
 // функция открытия подробной информации о предложении по нажатию на одну из меток
 function pinClickHandler(evt) {
-  var id = getPinId(evt);
-  if (id) {
-    deleteOfferFromDom(curOffer);
-    curOffer = makeOffer(offerArray[id]);
-    insertIntoDom(offerContainer, curOffer);
-    addOfferCloseEvtListeners(curOffer);
+  var pin = evt.target.closest('.map__pin:not(.map__pin--main)');
+  if (pin) {
+    var currentIndex = parseInt(pin.dataset.id, 10);
+    deleteOfferFromDom();
+    currentOffer = makeOffer(mapOffers[currentIndex]);
+    insertIntoDom(offerContainer, currentOffer);
+    addOfferCloseEvtListeners();
   }
 }
 
@@ -324,3 +308,33 @@ mapPinMain.addEventListener('mouseup', mainPinMouseupHandler);
 mapPinsContainer.addEventListener('click', pinClickHandler);
 
 setFormDisabled();
+inputAddress(mainPinStartX, mainPinStartY);
+
+/* module4-task2 */
+
+var TYPE_MINPRICE = {
+  'bungalo': 0,
+  'flat': 1000,
+  'house': 5000,
+  'palace': 10000
+};
+
+var priceInput = adForm.querySelector('#price');
+var typeInput = adForm.querySelector('#type');
+
+// функция, возвращающая мин. цену в зависимости от типа жилья
+function getMinPriceByType(type) {
+  return TYPE_MINPRICE[type];
+}
+
+// функция замены placeholder и минимального значения в зависимости от типа жилья
+function setPlaceholderByType(evt) {
+  var price = getMinPriceByType(evt.target.value);
+  priceInput.setAttribute('placeholder', price);
+  priceInput.setAttribute('min', price);
+}
+
+// функция синхронизации времени заезда и выезда
+
+typeInput.addEventListener('change', setPlaceholderByType);
+
