@@ -126,10 +126,11 @@ function makeObjectArray() {
 var mapPinTemplate = document.querySelector('template').content.querySelector('.map__pin');
 var mapPinsContainer = document.querySelector('.map__pins');
 
-function makePin(arrayObject) {
+function makePin(arrayObject, i) {
   var pin = mapPinTemplate.cloneNode(true);
   pin.style.left = arrayObject.location.x - PIN_WIDTH / 2 + 'px';
   pin.style.top = arrayObject.location.y - PIN_HEIGHT + 'px';
+  pin.dataset.id = i;
   pin.querySelector('img').src = arrayObject.author.avatar;
   pin.querySelector('img').alt = arrayObject.offer.title;
   return pin;
@@ -139,7 +140,7 @@ function makePin(arrayObject) {
 function makePinsFragment(array) {
   var PinsFragment = document.createDocumentFragment();
   for (var i = 0; i < array.length; i++) {
-    PinsFragment.appendChild(makePin(array[i]));
+    PinsFragment.appendChild(makePin(array[i], i));
   }
   return PinsFragment;
 }
@@ -198,10 +199,142 @@ function makeOffer(arrayObject) {
   return offer;
 }
 
-var map = document.querySelector('.map');
-map.classList.remove('map--faded');
+/* module4-task1 */
 
-var offerArray = makeObjectArray();
-insertIntoDom(mapPinsContainer, makePinsFragment(offerArray));
-insertIntoDom(offerContainer, makeOffer(offerArray[0]));
+var MAIN_PIN_WIDTH = 65;
+var MAIN_PIN_HEIGHT = 65 + 22;
+var ESC_CODE = 27;
+
+var mapOffers = makeObjectArray();
+var map = document.querySelector('.map');
+var mapPinMain = document.querySelector('.map__pin--main');
+var adForm = document.querySelector('.ad-form');
+var adFormFieldsets = adForm.querySelectorAll('fieldset');
+var addressField = adForm.querySelector('#address');
+var currentOffer;
+var mainPinStartX = mapPinMain.offsetLeft + MAIN_PIN_WIDTH / 2;
+var mainPinStartY = mapPinMain.offsetTop + MAIN_PIN_HEIGHT;
+
+// функция разблокировки формы
+function setFormEnabled() {
+  adForm.classList.remove('ad-form--disabled');
+  for (var i = 0; i < adFormFieldsets.length; i++) {
+    adFormFieldsets[i].removeAttribute('disabled');
+  }
+}
+
+
+// функция блокировки формы
+function setFormDisabled() {
+  adForm.classList.add('ad-form--disabled');
+  for (var i = 0; i < adFormFieldsets.length; i++) {
+    adFormFieldsets[i].setAttribute('disabled', '');
+  }
+}
+
+// функция проверки состояния карты
+function isMapFaded() {
+  return map.classList.contains('map--faded');
+}
+
+// функция разблокировки карты
+function setMapEnabled() {
+  map.classList.remove('map--faded');
+  setFormEnabled();
+}
+
+// функция вставки значения в поле адреса
+function inputAddress(x, y) {
+  addressField.value = x + ', ' + y;
+}
+
+// функция запуска разблокировки страницы по нажатию на главный указатель
+function mainPinMouseupHandler() {
+  if (isMapFaded()) {
+    setMapEnabled();
+    inputAddress(mainPinStartX, mainPinStartY);
+    insertIntoDom(mapPinsContainer, makePinsFragment(mapOffers));
+  }
+}
+
+// функция удаления предложения из DOM
+function deleteOfferFromDom() {
+  if (currentOffer) {
+    currentOffer.remove();
+  }
+}
+
+// функция запуска обработчиков событий для закрытия текущего предложения
+function addOfferCloseEvtListeners() {
+  currentOffer.querySelector('.popup__close').addEventListener('click', closeBtnPressHandler);
+  document.addEventListener('keydown', escPressHandler);
+}
+
+// функция удаления обработчиков событий при закрытии текущего предложения
+function removeOfferCloseEvtListeners() {
+  currentOffer.querySelector('.popup__close').removeEventListener('click', closeBtnPressHandler);
+  document.removeEventListener('keydown', escPressHandler);
+}
+
+// функция обработки события нажатия на кнопку закрыть
+function closeBtnPressHandler() {
+  deleteOfferFromDom();
+  removeOfferCloseEvtListeners();
+  currentOffer = null;
+}
+
+// функция обработки события нажатия на escape
+function escPressHandler(evt) {
+  if (evt.keyCode === ESC_CODE) {
+    deleteOfferFromDom();
+    removeOfferCloseEvtListeners();
+    currentOffer = null;
+  }
+}
+
+// функция открытия подробной информации о предложении по нажатию на одну из меток
+function pinClickHandler(evt) {
+  var pin = evt.target.closest('.map__pin:not(.map__pin--main)');
+  if (pin) {
+    var currentIndex = parseInt(pin.dataset.id, 10);
+    deleteOfferFromDom();
+    currentOffer = makeOffer(mapOffers[currentIndex]);
+    insertIntoDom(offerContainer, currentOffer);
+    addOfferCloseEvtListeners();
+  }
+}
+
+mapPinMain.addEventListener('mouseup', mainPinMouseupHandler);
+mapPinsContainer.addEventListener('click', pinClickHandler);
+
+setFormDisabled();
+inputAddress(mainPinStartX, mainPinStartY);
+
+/* module4-task2 */
+
+var TYPE_MINPRICE = {
+  'bungalo': 0,
+  'flat': 1000,
+  'house': 5000,
+  'palace': 10000
+};
+
+var priceInput = adForm.querySelector('#price');
+var typeInput = adForm.querySelector('#type');
+
+// функция, возвращающая мин. цену в зависимости от типа жилья
+function getMinPriceByType(type) {
+  return TYPE_MINPRICE[type];
+}
+
+// функция замены placeholder и минимального значения в зависимости от типа жилья
+function setPlaceholderByType(evt) {
+  var price = getMinPriceByType(evt.target.value);
+  priceInput.setAttribute('placeholder', price);
+  priceInput.setAttribute('min', price);
+}
+
+// функция синхронизации времени заезда и выезда
+
+typeInput.addEventListener('change', setPlaceholderByType);
 
