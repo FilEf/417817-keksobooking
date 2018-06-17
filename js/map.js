@@ -201,28 +201,33 @@ function makeOffer(arrayObject) {
 
 /* module4-task1 */
 
-var mapPinMain = document.querySelector('.map__pin--main');
-var MAIN_PIN_WIDTH = mapPinMain.clientWidth;
-var MAIN_PIN_HEIGHT = mapPinMain.clientHeight + 22;
-var START_PIN_X = mapPinMain.offsetLeft + MAIN_PIN_WIDTH / 2;
-var START_PIN_Y = mapPinMain.offsetTop + MAIN_PIN_HEIGHT;
-
+var MAIN_PIN_WIDTH = 65;
+var MAIN_PIN_HEIGHT = 65 + 22;
+var ESC_CODE = 27;
 
 var offerArray = makeObjectArray();
 var map = document.querySelector('.map');
+var mapPinMain = document.querySelector('.map__pin--main');
+var notice = document.querySelector('.notice');
 var adForm = document.querySelector('.ad-form');
 var adFormFieldset = adForm.querySelectorAll('fieldset');
+var curOffer;
+
+// функция проверки состояния карты
+function returnMapStatus() {
+  return map.classList.contains('map--faded');
+}
 
 // функция разблокировки карты
 function setMapEnabled() {
-  if (document.querySelector('.map--faded')) {
+  if (returnMapStatus()) {
     map.classList.remove('map--faded');
   }
 }
 
 // функция разблокировки формы
 function setFormEnabled() {
-  if (document.querySelector('.ad-form--disabled')) {
+  if (notice.querySelector('.ad-form--disabled')) {
     adForm.classList.remove('ad-form--disabled');
   }
 }
@@ -235,26 +240,86 @@ function setFormDisabled() {
 }
 
 // функция вставки значения в поле адреса
-function inputAddress(x, y) {
-  document.getElementById('address').value = x + ', ' + y;
+function inputAddress() {
+  var startX = mapPinMain.offsetLeft + MAIN_PIN_WIDTH / 2;
+  var startY = mapPinMain.offsetTop + MAIN_PIN_HEIGHT;
+  document.getElementById('address').value = startX + ', ' + startY;
 }
 
-// функция для запуска разблокировки страницы
-function setAllEnabled() {
-  setMapEnabled();
-  setFormEnabled();
-  inputAddress(START_PIN_X, START_PIN_Y);
-  insertIntoDom(mapPinsContainer, makePinsFragment(offerArray));
-  /*insertIntoDom(offerContainer, makeOffer(offerArray[0]));*/
-  for (var i = 0; i < adFormFieldset.length; i++) {
-    adFormFieldset[i].removeAttribute('disabled');
+// функция запуска разблокировки страницы по нажатию на главный указатель
+function mainPinMouseupHandler() {
+  if (returnMapStatus()) {
+    setMapEnabled();
+    setFormEnabled();
+    inputAddress();
+    insertIntoDom(mapPinsContainer, makePinsFragment(offerArray));
+    for (var i = 0; i < adFormFieldset.length; i++) {
+      adFormFieldset[i].removeAttribute('disabled');
+    }
   }
 }
 
-mapPinMain.addEventListener('mouseup', setAllEnabled);
-mapPinsContainer.addEventListener('mouseup', console.log);
+// функция получения id нажатого указателя
+function getPinId(evt) {
+  var target = evt.target;
+  var id;
+  while (target !== mapPinsContainer) {
+    if (target.classList.contains('map__pin')) {
+      id = target.id.slice(3);
+      return id;
+    } else {
+      target = target.parentNode;
+    }
+  }
+  return id;
+}
+
+// функция удаления предложения из DOM
+function deleteOfferFromDom(offer) {
+  if (offer) {
+    offer.parentNode.removeChild(offer);
+  }
+}
+
+// функция запуска обработчиков событий для закрытия текущего предложения
+function addOfferCloseEvtListeners(offer) {
+  offer.querySelector('.popup__close').addEventListener('click', closeBtnPressHandler);
+  document.addEventListener('keydown', escPressHandler);
+}
+
+// функция удаления обработчиков событий при закрытии текущего предложения
+function removeOfferCloseEvtListeners(offer) {
+  offer.querySelector('.popup__close').removeEventListener('click', closeBtnPressHandler);
+  document.removeEventListener('keydown', escPressHandler);
+}
+
+// функция обработки события нажатия на кнопку закрыть
+function closeBtnPressHandler() {
+  deleteOfferFromDom(curOffer);
+  removeOfferCloseEvtListeners(curOffer);
+  curOffer = null;
+}
+
+// функция обработки события нажатия на escape
+function escPressHandler(evt) {
+  if (evt.keyCode === ESC_CODE) {
+    deleteOfferFromDom(curOffer);
+    curOffer = null;
+  }
+}
+
+// функция открытия подробной информации о предложении по нажатию на одну из меток
+function pinClickHandler(evt) {
+  var id = getPinId(evt);
+  if (id) {
+    deleteOfferFromDom(curOffer);
+    curOffer = makeOffer(offerArray[id]);
+    insertIntoDom(offerContainer, curOffer);
+    addOfferCloseEvtListeners(curOffer);
+  }
+}
+
+mapPinMain.addEventListener('mouseup', mainPinMouseupHandler);
+mapPinsContainer.addEventListener('click', pinClickHandler);
 
 setFormDisabled();
-
-
-
