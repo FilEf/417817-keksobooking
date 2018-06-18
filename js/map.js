@@ -243,6 +243,12 @@ function setMapEnabled() {
   setFormEnabled();
 }
 
+// функция блокировки карты
+function setMapDisabled() {
+  map.classList.add('map--faded');
+  setFormDisabled();
+}
+
 // функция вставки значения в поле адреса
 function inputAddress(x, y) {
   addressField.value = x + ', ' + y;
@@ -338,7 +344,7 @@ var capacity = adForm.querySelector('#capacity');
 var timeinValues = timein.querySelectorAll('option');
 var timeoutValues = timeout.querySelectorAll('option');
 var capacityValues = capacity.querySelectorAll('option');
-
+var resetButton = adForm.querySelector('.ad-form__reset');
 
 // функция, возвращающая мин. цену в зависимости от типа жилья
 function getMinPriceByType(type) {
@@ -408,12 +414,31 @@ function roomNumberChangeHandler(evt) {
   capacity[findFirstValidValue()].selected = true;
 }
 
+// функция удаления указателей
+function deletePins() {
+  var pins = map.querySelectorAll('.map__pin:not(.map__pin--main)');
+  var i = 0;
+  while (i < pins.length) {
+    pins[i].remove();
+    i++;
+  }
+}
+
+// функция возврата страницы в изначальное положение
+function resetClickHandler() {
+  deletePins();
+  adForm.reset();
+  inputAddress(mainPinStartX, mainPinStartY);
+  setMapDisabled();
+}
+
 // функция запуска обработчиков событий на форме
 function addFormListeners() {
   typeInput.addEventListener('change', typeInputChangeHandler);
   timein.addEventListener('change', timeinInputChangeHandler);
   timeout.addEventListener('change', timeoutInputChangeHandler);
   roomNumber.addEventListener('change', roomNumberChangeHandler);
+  resetButton.addEventListener('click', resetClickHandler);
 }
 
 addFormListeners();
