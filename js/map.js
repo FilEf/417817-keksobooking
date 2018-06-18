@@ -372,7 +372,7 @@ function timeinInputChangeHandler(evt) {
   timeout[timeoutIndex].selected = true;
 }
 
-// функция синхронизации времени выезда по времени заезда
+// функция синхронизации времени заезда по времени выезда
 function timeoutInputChangeHandler(evt) {
   var timeinIndex = evt.target.options.selectedIndex;
   removeAttributeSelected(timeinValues);
@@ -424,7 +424,7 @@ function deletePins() {
   }
 }
 
-// функция возврата страницы в изначальное положение
+// функция возврата страницы в изначальное состояние
 function resetClickHandler() {
   deletePins();
   adForm.reset();
@@ -442,4 +442,3 @@ function addFormListeners() {
 }
 
 addFormListeners();
-
