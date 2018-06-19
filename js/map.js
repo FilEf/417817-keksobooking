@@ -358,25 +358,14 @@ function typeInputChangeHandler(evt) {
   priceInput.setAttribute('min', price);
 }
 
-// функция удаления selected у значений из списка
-function removeAttributeSelected(list) {
-  for (var i = 0; i < list.length; i++) {
-    list[i].removeAttribute('selected');
-  }
-}
-
 // функция синхронизации времени выезда по времени заезда
-function timeinInputChangeHandler(evt) {
-  var timeoutIndex = evt.target.options.selectedIndex;
-  removeAttributeSelected(timeoutValues);
-  timeout[timeoutIndex].selected = true;
+function timeinInputChangeHandler() {
+  timeout.value = timein.value;
 }
 
 // функция синхронизации времени заезда по времени выезда
-function timeoutInputChangeHandler(evt) {
-  var timeinIndex = evt.target.options.selectedIndex;
-  removeAttributeSelected(timeinValues);
-  timein[timeinIndex].selected = true;
+function timeoutInputChangeHandler() {
+  timein.value = timeout.value;
 }
 
 // функция поиска индекса первого валидного значения из списка
@@ -392,11 +381,11 @@ function findFirstValidValue() {
 function setDisabledCapacityByRoomNumbers(value) {
   if (value !== 0) {
     for (var i = 0; i < capacityValues.length; i++) {
-      capacityValues[i].disabled = capacityValues[i].value === '0' || capacityValues[i].value > value ? true : false;
+      capacityValues[i].disabled = capacityValues[i].value === '0' || capacityValues[i].value > value;
     }
   } else {
     for (var j = 0; j < capacityValues.length; j++) {
-      capacityValues[j].disabled = capacityValues[j].value !== value.toString() ? true : false;
+      capacityValues[j].disabled = capacityValues[j].value !== value.toString();
     }
   }
 }
