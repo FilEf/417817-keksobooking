@@ -138,11 +138,11 @@ function makePin(arrayObject, i) {
 
 // функция создания фрагмента с указателями
 function makePinsFragment(array) {
-  var PinsFragment = document.createDocumentFragment();
+  var pinsFragment = document.createDocumentFragment();
   for (var i = 0; i < array.length; i++) {
-    PinsFragment.appendChild(makePin(array[i], i));
+    pinsFragment.appendChild(makePin(array[i], i));
   }
-  return PinsFragment;
+  return pinsFragment;
 }
 
 // функция создания фрагмента со списком удобств
@@ -249,16 +249,32 @@ function setMapDisabled() {
   setFormDisabled();
 }
 
+// функция вычисления координат главного указателя
+function getMainPinCoords() {
+  if (isMapFaded()) {
+    return {
+      x: mainPinStartX,
+      y: mainPinStartY
+    };
+  } else {
+    return {
+      x: mapPinMain.offsetLeft + MAIN_PIN_WIDTH / 2,
+      y: mapPinMain.offsetTop + MAIN_PIN_HEIGHT
+    };
+  }
+}
+
 // функция вставки значения в поле адреса
-function inputAddress(x, y) {
-  addressField.value = x + ', ' + y;
+function inputAddress() {
+  var mainPinCoords = getMainPinCoords();
+  addressField.value = mainPinCoords.x + ', ' + mainPinCoords.y;
 }
 
 // функция запуска разблокировки страницы по нажатию на главный указатель
 function mainPinMouseupHandler() {
+  inputAddress();
   if (isMapFaded()) {
     setMapEnabled();
-    inputAddress(mainPinStartX, mainPinStartY);
     insertIntoDom(mapPinsContainer, makePinsFragment(mapOffers));
   }
 }
@@ -317,7 +333,7 @@ mapPinMain.addEventListener('mouseup', mainPinMouseupHandler);
 mapPinsContainer.addEventListener('click', pinClickHandler);
 
 setFormDisabled();
-inputAddress(mainPinStartX, mainPinStartY);
+inputAddress();
 
 /* module4-task2 */
 
@@ -360,23 +376,21 @@ function timeoutInputChangeHandler() {
 }
 
 // функция проставления disabled у невалидных значений
-function syncronizeDisabledCapacityByRoomNumbers(roomValue) {
+function syncronizeCapacityByRoomNumbers(roomValue) {
   var lastEnabledIndex = null;
   for (var i = 0; i < capacityValues.length; i++) {
     var capacityValue = parseInt(capacityValues[i].value, 10);
     var isDisabled = roomValue !== 100 ? capacityValue === 0 || capacityValue > roomValue : capacityValue !== 0;
     capacityValues[i].disabled = isDisabled;
     lastEnabledIndex = isDisabled ? lastEnabledIndex : i;
-    if (lastEnabledIndex) {
-      capacity[lastEnabledIndex].selected = true;
-    }
   }
+  capacity[lastEnabledIndex].selected = true;
 }
 
 // функция синхронизации кол-ва комнат с кол-вом мест
 function roomNumberChangeHandler(evt) {
   var roomValue = parseInt(evt.target.value, 10);
-  syncronizeDisabledCapacityByRoomNumbers(roomValue);
+  syncronizeCapacityByRoomNumbers(roomValue);
 }
 
 // функция удаления указателей
@@ -392,6 +406,7 @@ function deletePins() {
 // функция возврата страницы в изначальное состояние
 function resetClickHandler() {
   deletePins();
+  closeOffer();
   adForm.reset();
   inputAddress(mainPinStartX, mainPinStartY);
   setMapDisabled();
