@@ -202,7 +202,8 @@ function makeOffer(arrayObject) {
 /* module4-task1 */
 
 var MAIN_PIN_WIDTH = 65;
-var MAIN_PIN_HEIGHT = 65 + 22;
+var MAIN_PIN_HEIGHT = 65;
+var MAIN_PIN_TAIL = 22;
 var ESC_CODE = 27;
 
 var mapOffers = makeObjectArray();
@@ -213,7 +214,7 @@ var adFormFieldsets = adForm.querySelectorAll('fieldset');
 var addressField = adForm.querySelector('#address');
 var currentOffer;
 var mainPinStartX = mapPinMain.offsetLeft + MAIN_PIN_WIDTH / 2;
-var mainPinStartY = mapPinMain.offsetTop + MAIN_PIN_HEIGHT;
+var mainPinStartY = mapPinMain.offsetTop + MAIN_PIN_HEIGHT / 2;
 
 // функция разблокировки формы
 function setFormEnabled() {
@@ -241,6 +242,7 @@ function isMapFaded() {
 function setMapEnabled() {
   map.classList.remove('map--faded');
   setFormEnabled();
+  inputAddress();
 }
 
 // функция блокировки карты
@@ -259,7 +261,7 @@ function getMainPinCoords() {
   } else {
     return {
       x: mapPinMain.offsetLeft + MAIN_PIN_WIDTH / 2,
-      y: mapPinMain.offsetTop + MAIN_PIN_HEIGHT
+      y: mapPinMain.offsetTop + MAIN_PIN_HEIGHT + MAIN_PIN_TAIL
     };
   }
 }
@@ -272,7 +274,6 @@ function inputAddress() {
 
 // функция запуска разблокировки страницы по нажатию на главный указатель
 function mainPinMouseupHandler() {
-  inputAddress();
   if (isMapFaded()) {
     setMapEnabled();
     insertIntoDom(mapPinsContainer, makePinsFragment(mapOffers));
@@ -329,7 +330,7 @@ function pinClickHandler(evt) {
   }
 }
 
-mapPinMain.addEventListener('mouseup', mainPinMouseupHandler);
+mapPinMain.addEventListener('mouseup', mainPinMouseupHandler, true);
 mapPinsContainer.addEventListener('click', pinClickHandler);
 
 setFormDisabled();
