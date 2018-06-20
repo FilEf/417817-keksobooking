@@ -138,11 +138,11 @@ function makePin(arrayObject, i) {
 
 // функция создания фрагмента с указателями
 function makePinsFragment(array) {
-  var PinsFragment = document.createDocumentFragment();
+  var pinsFragment = document.createDocumentFragment();
   for (var i = 0; i < array.length; i++) {
-    PinsFragment.appendChild(makePin(array[i], i));
+    pinsFragment.appendChild(makePin(array[i], i));
   }
-  return PinsFragment;
+  return pinsFragment;
 }
 
 // функция создания фрагмента со списком удобств
@@ -202,7 +202,8 @@ function makeOffer(arrayObject) {
 /* module4-task1 */
 
 var MAIN_PIN_WIDTH = 65;
-var MAIN_PIN_HEIGHT = 65 + 22;
+var MAIN_PIN_HEIGHT = 65;
+var MAIN_PIN_TAIL = 22;
 var ESC_CODE = 27;
 
 var mapOffers = makeObjectArray();
@@ -213,7 +214,7 @@ var adFormFieldsets = adForm.querySelectorAll('fieldset');
 var addressField = adForm.querySelector('#address');
 var currentOffer;
 var mainPinStartX = mapPinMain.offsetLeft + MAIN_PIN_WIDTH / 2;
-var mainPinStartY = mapPinMain.offsetTop + MAIN_PIN_HEIGHT;
+var mainPinStartY = mapPinMain.offsetTop + MAIN_PIN_HEIGHT / 2;
 
 // функция разблокировки формы
 function setFormEnabled() {
@@ -241,18 +242,40 @@ function isMapFaded() {
 function setMapEnabled() {
   map.classList.remove('map--faded');
   setFormEnabled();
+  inputAddress();
+}
+
+// функция блокировки карты
+function setMapDisabled() {
+  map.classList.add('map--faded');
+  setFormDisabled();
+}
+
+// функция вычисления координат главного указателя
+function getMainPinCoords() {
+  if (isMapFaded()) {
+    return {
+      x: mainPinStartX,
+      y: mainPinStartY
+    };
+  } else {
+    return {
+      x: mapPinMain.offsetLeft + MAIN_PIN_WIDTH / 2,
+      y: mapPinMain.offsetTop + MAIN_PIN_HEIGHT + MAIN_PIN_TAIL
+    };
+  }
 }
 
 // функция вставки значения в поле адреса
-function inputAddress(x, y) {
-  addressField.value = x + ', ' + y;
+function inputAddress() {
+  var mainPinCoords = getMainPinCoords();
+  addressField.value = mainPinCoords.x + ', ' + mainPinCoords.y;
 }
 
 // функция запуска разблокировки страницы по нажатию на главный указатель
 function mainPinMouseupHandler() {
   if (isMapFaded()) {
     setMapEnabled();
-    inputAddress(mainPinStartX, mainPinStartY);
     insertIntoDom(mapPinsContainer, makePinsFragment(mapOffers));
   }
 }
@@ -276,19 +299,22 @@ function removeOfferCloseEvtListeners() {
   document.removeEventListener('keydown', escPressHandler);
 }
 
-// функция обработки события нажатия на кнопку закрыть
-function closeBtnPressHandler() {
+// функция закрытия подробной информации
+function closeOffer() {
   deleteOfferFromDom();
   removeOfferCloseEvtListeners();
   currentOffer = null;
 }
 
+// функция обработки события нажатия на кнопку закрыть
+function closeBtnPressHandler() {
+  closeOffer();
+}
+
 // функция обработки события нажатия на escape
 function escPressHandler(evt) {
   if (evt.keyCode === ESC_CODE) {
-    deleteOfferFromDom();
-    removeOfferCloseEvtListeners();
-    currentOffer = null;
+    closeOffer();
   }
 }
 
@@ -304,11 +330,11 @@ function pinClickHandler(evt) {
   }
 }
 
-mapPinMain.addEventListener('mouseup', mainPinMouseupHandler);
+mapPinMain.addEventListener('mouseup', mainPinMouseupHandler, true);
 mapPinsContainer.addEventListener('click', pinClickHandler);
 
 setFormDisabled();
-inputAddress(mainPinStartX, mainPinStartY);
+inputAddress();
 
 /* module4-task2 */
 
@@ -321,20 +347,79 @@ var TYPE_MINPRICE = {
 
 var priceInput = adForm.querySelector('#price');
 var typeInput = adForm.querySelector('#type');
+var timein = adForm.querySelector('#timein');
+var timeout = adForm.querySelector('#timeout');
+var roomNumber = adForm.querySelector('#room_number');
+var capacity = adForm.querySelector('#capacity');
+var capacityValues = capacity.querySelectorAll('option');
+var resetButton = adForm.querySelector('.ad-form__reset');
 
 // функция, возвращающая мин. цену в зависимости от типа жилья
 function getMinPriceByType(type) {
   return TYPE_MINPRICE[type];
 }
 
-// функция замены placeholder и минимального значения в зависимости от типа жилья
-function setPlaceholderByType(evt) {
+// функция обработки события смены типа жилья
+function typeInputChangeHandler(evt) {
   var price = getMinPriceByType(evt.target.value);
   priceInput.setAttribute('placeholder', price);
   priceInput.setAttribute('min', price);
 }
 
-// функция синхронизации времени заезда и выезда
+// функция синхронизации времени выезда по времени заезда
+function timeinInputChangeHandler() {
+  timeout.value = timein.value;
+}
 
-typeInput.addEventListener('change', setPlaceholderByType);
+// функция синхронизации времени заезда по времени выезда
+function timeoutInputChangeHandler() {
+  timein.value = timeout.value;
+}
 
+// функция проставления disabled у невалидных значений
+function syncronizeCapacityByRoomNumbers(roomValue) {
+  var lastEnabledIndex = null;
+  for (var i = 0; i < capacityValues.length; i++) {
+    var capacityValue = parseInt(capacityValues[i].value, 10);
+    var isDisabled = roomValue !== 100 ? capacityValue === 0 || capacityValue > roomValue : capacityValue !== 0;
+    capacityValues[i].disabled = isDisabled;
+    lastEnabledIndex = isDisabled ? lastEnabledIndex : i;
+  }
+  capacity[lastEnabledIndex].selected = true;
+}
+
+// функция синхронизации кол-ва комнат с кол-вом мест
+function roomNumberChangeHandler(evt) {
+  var roomValue = parseInt(evt.target.value, 10);
+  syncronizeCapacityByRoomNumbers(roomValue);
+}
+
+// функция удаления указателей
+function deletePins() {
+  var pins = map.querySelectorAll('.map__pin:not(.map__pin--main)');
+  var i = 0;
+  while (i < pins.length) {
+    pins[i].remove();
+    i++;
+  }
+}
+
+// функция возврата страницы в изначальное состояние
+function resetClickHandler() {
+  deletePins();
+  closeOffer();
+  adForm.reset();
+  inputAddress(mainPinStartX, mainPinStartY);
+  setMapDisabled();
+}
+
+// функция запуска обработчиков событий на форме
+function addFormListeners() {
+  typeInput.addEventListener('change', typeInputChangeHandler);
+  timein.addEventListener('change', timeinInputChangeHandler);
+  timeout.addEventListener('change', timeoutInputChangeHandler);
+  roomNumber.addEventListener('change', roomNumberChangeHandler);
+  resetButton.addEventListener('click', resetClickHandler);
+}
+
+addFormListeners();
