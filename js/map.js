@@ -328,21 +328,12 @@ var TYPE_MINPRICE = {
   'palace': 10000
 };
 
-var ROOMS_CAPACITY = {
-  1: 1,
-  2: 2,
-  3: 3,
-  100: 0
-};
-
 var priceInput = adForm.querySelector('#price');
 var typeInput = adForm.querySelector('#type');
 var timein = adForm.querySelector('#timein');
 var timeout = adForm.querySelector('#timeout');
 var roomNumber = adForm.querySelector('#room_number');
 var capacity = adForm.querySelector('#capacity');
-var timeinValues = timein.querySelectorAll('option');
-var timeoutValues = timeout.querySelectorAll('option');
 var capacityValues = capacity.querySelectorAll('option');
 var resetButton = adForm.querySelector('.ad-form__reset');
 
@@ -358,60 +349,34 @@ function typeInputChangeHandler(evt) {
   priceInput.setAttribute('min', price);
 }
 
-// функция удаления selected у значений из списка
-function removeAttributeSelected(list) {
-  for (var i = 0; i < list.length; i++) {
-    list[i].removeAttribute('selected');
-  }
-}
-
 // функция синхронизации времени выезда по времени заезда
-function timeinInputChangeHandler(evt) {
-  var timeoutIndex = evt.target.options.selectedIndex;
-  removeAttributeSelected(timeoutValues);
-  timeout[timeoutIndex].selected = true;
+function timeinInputChangeHandler() {
+  timeout.value = timein.value;
 }
 
 // функция синхронизации времени заезда по времени выезда
-function timeoutInputChangeHandler(evt) {
-  var timeinIndex = evt.target.options.selectedIndex;
-  removeAttributeSelected(timeinValues);
-  timein[timeinIndex].selected = true;
-}
-
-// функция поиска индекса первого валидного значения из списка
-function findFirstValidValue() {
-  var i = 0;
-  while (i < capacityValues.length && capacity[i].disabled === true) {
-    i++;
-  }
-  return i;
+function timeoutInputChangeHandler() {
+  timein.value = timeout.value;
 }
 
 // функция проставления disabled у невалидных значений
-function setDisabledCapacityByRoomNumbers(value) {
-  if (value !== 0) {
-    for (var i = 0; i < capacityValues.length; i++) {
-      capacityValues[i].disabled = capacityValues[i].value === '0' || capacityValues[i].value > value ? true : false;
-    }
-  } else {
-    for (var j = 0; j < capacityValues.length; j++) {
-      capacityValues[j].disabled = capacityValues[j].value !== value.toString() ? true : false;
+function syncronizeDisabledCapacityByRoomNumbers(roomValue) {
+  var lastEnabledIndex = null;
+  for (var i = 0; i < capacityValues.length; i++) {
+    var capacityValue = parseInt(capacityValues[i].value, 10);
+    var isDisabled = roomValue !== 100 ? capacityValue === 0 || capacityValue > roomValue : capacityValue !== 0;
+    capacityValues[i].disabled = isDisabled;
+    lastEnabledIndex = isDisabled ? lastEnabledIndex : i;
+    if (lastEnabledIndex) {
+      capacity[lastEnabledIndex].selected = true;
     }
   }
 }
 
-// функция, возвращающая кол-во мест в зависимости от кол-ва комнат
-function getCapacityByRoomNumber(number) {
-  return ROOMS_CAPACITY[number];
-}
-
-
 // функция синхронизации кол-ва комнат с кол-вом мест
 function roomNumberChangeHandler(evt) {
-  var capacityValue = getCapacityByRoomNumber(evt.target.value);
-  setDisabledCapacityByRoomNumbers(capacityValue);
-  capacity[findFirstValidValue()].selected = true;
+  var roomValue = parseInt(evt.target.value, 10);
+  syncronizeDisabledCapacityByRoomNumbers(roomValue);
 }
 
 // функция удаления указателей
@@ -442,4 +407,3 @@ function addFormListeners() {
 }
 
 addFormListeners();
-
