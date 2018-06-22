@@ -89,6 +89,8 @@ function getRandCutArray(array) {
 
 // функция для заполнения свойств объекта
 function makeObjectArray() {
+  var avatar = getShuffledArray(PHOTO_NAME_ARRAY);
+  var title = getShuffledArray(TITLE_ARRAY);
   for (var i = 0; i < PHOTO_QUANTITY; i++) {
     var x = getRandNum(MIN_X, MAX_X);
     var y = getRandNum(MIN_Y, MAX_Y);
@@ -96,11 +98,11 @@ function makeObjectArray() {
       {
         author:
           {
-            avatar: 'img/avatars/user0' + getRandElement(PHOTO_NAME_ARRAY) + '.png'
+            avatar: 'img/avatars/user0' + avatar[i] + '.png'
           },
         offer:
           {
-            title: getRandElement(TITLE_ARRAY),
+            title: title[i],
             address: x + ', ' + y,
             price: getRandNum(MIN_PRICE, MAX_PRICE),
             type: TYPE_RUS[getRandElement(TYPE_ARRAY)],
@@ -204,6 +206,8 @@ function makeOffer(arrayObject) {
 var MAIN_PIN_WIDTH = 65;
 var MAIN_PIN_HEIGHT = 65;
 var MAIN_PIN_TAIL = 22;
+var MAIN_PIN_START_X = 570;
+var MAIN_PIN_START_Y = 375;
 var ESC_CODE = 27;
 
 var mapOffers = makeObjectArray();
@@ -213,8 +217,8 @@ var adForm = document.querySelector('.ad-form');
 var adFormFieldsets = adForm.querySelectorAll('fieldset');
 var addressField = adForm.querySelector('#address');
 var currentOffer;
-var mainPinStartX = mapPinMain.offsetLeft + MAIN_PIN_WIDTH / 2;
-var mainPinStartY = mapPinMain.offsetTop + MAIN_PIN_HEIGHT / 2;
+var mainPinCenterX = MAIN_PIN_START_X + MAIN_PIN_WIDTH / 2;
+var mainPinCenterY = MAIN_PIN_START_Y + MAIN_PIN_HEIGHT / 2;
 
 // функция разблокировки формы
 function setFormEnabled() {
@@ -222,6 +226,7 @@ function setFormEnabled() {
   for (var i = 0; i < adFormFieldsets.length; i++) {
     adFormFieldsets[i].removeAttribute('disabled');
   }
+  inputAddress();
 }
 
 
@@ -231,6 +236,7 @@ function setFormDisabled() {
   for (var i = 0; i < adFormFieldsets.length; i++) {
     adFormFieldsets[i].setAttribute('disabled', '');
   }
+  inputAddress();
 }
 
 // функция проверки состояния карты
@@ -242,12 +248,12 @@ function isMapFaded() {
 function setMapEnabled() {
   map.classList.remove('map--faded');
   setFormEnabled();
-  inputAddress();
 }
 
 // функция блокировки карты
 function setMapDisabled() {
   map.classList.add('map--faded');
+  setMapPinMainCoords(MAIN_PIN_START_X, MAIN_PIN_START_Y);
   setFormDisabled();
 }
 
@@ -255,8 +261,8 @@ function setMapDisabled() {
 function getMainPinCoords() {
   if (isMapFaded()) {
     return {
-      x: mainPinStartX,
-      y: mainPinStartY
+      x: mainPinCenterX,
+      y: mainPinCenterY
     };
   } else {
     return {
@@ -295,7 +301,9 @@ function addOfferCloseEvtListeners() {
 
 // функция удаления обработчиков событий при закрытии текущего предложения
 function removeOfferCloseEvtListeners() {
-  currentOffer.querySelector('.popup__close').removeEventListener('click', closeBtnPressHandler);
+  if (currentOffer) {
+    currentOffer.querySelector('.popup__close').removeEventListener('click', closeBtnPressHandler);
+  }
   document.removeEventListener('keydown', escPressHandler);
 }
 
@@ -330,11 +338,10 @@ function pinClickHandler(evt) {
   }
 }
 
-mapPinMain.addEventListener('mouseup', mainPinMouseupHandler, true);
+mapPinMain.addEventListener('mouseup', mainPinMouseupHandler);
 mapPinsContainer.addEventListener('click', pinClickHandler);
 
 setFormDisabled();
-inputAddress();
 
 /* module4-task2 */
 
@@ -409,7 +416,6 @@ function resetClickHandler() {
   deletePins();
   closeOffer();
   adForm.reset();
-  inputAddress(mainPinStartX, mainPinStartY);
   setMapDisabled();
 }
 
@@ -423,3 +429,75 @@ function addFormListeners() {
 }
 
 addFormListeners();
+
+/* module5-task1 */
+
+var LIMITS = {
+  left: 0 - MAIN_PIN_WIDTH / 2,
+  top: 130 - (MAIN_PIN_HEIGHT + MAIN_PIN_TAIL),
+  right: document.querySelector('body').offsetWidth - MAIN_PIN_WIDTH / 2,
+  bottom: 630 - (MAIN_PIN_HEIGHT + MAIN_PIN_TAIL)
+};
+// функция ограничения передвижения пина
+function getNewCoords(x, y) {
+  var newCoords = {
+    x: x,
+    y: y
+  };
+  if (newCoords.x < LIMITS.left) {
+    newCoords.x = LIMITS.left;
+  }
+  if (newCoords.y < LIMITS.top) {
+    newCoords.y = LIMITS.top;
+  }
+  if (newCoords.x > LIMITS.right) {
+    newCoords.x = LIMITS.right;
+  }
+  if (newCoords.y > LIMITS.bottom) {
+    newCoords.y = LIMITS.bottom;
+  }
+  return newCoords;
+}
+// функция назанчения координат пина
+function setMapPinMainCoords(x, y) {
+  mapPinMain.style.left = x + 'px';
+  mapPinMain.style.top = y + 'px';
+}
+
+// функция управления процессом drag'n'drop
+function manageDragNDrop(evt) {
+  var startCoords = {
+    x: evt.clientX,
+    y: evt.clientY
+  };
+  var shift = {};
+  // Функция обработки перемещения пина
+  function onMouseMove(moveEvt) {
+    moveEvt.preventDefault();
+    shift = {
+      x: startCoords.x - moveEvt.clientX,
+      y: startCoords.y - moveEvt.clientY
+    };
+    startCoords = {
+      x: moveEvt.clientX,
+      y: moveEvt.clientY
+    };
+    var actualX = mapPinMain.offsetLeft - shift.x;
+    var actualY = mapPinMain.offsetTop - shift.y;
+    var newCoords = getNewCoords(actualX, actualY);
+    inputAddress(startCoords.x, startCoords.y);
+    setMapPinMainCoords(newCoords.x, newCoords.y);
+  }
+  // Функция обработки отпускания пина
+  function onMouseUp(upEvt) {
+    upEvt.preventDefault();
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  }
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+}
+
+mapPinMain.addEventListener('mousedown', manageDragNDrop);
+
