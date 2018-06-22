@@ -89,6 +89,8 @@ function getRandCutArray(array) {
 
 // функция для заполнения свойств объекта
 function makeObjectArray() {
+  var avatar = getShuffledArray(PHOTO_NAME_ARRAY);
+  var title = getShuffledArray(TITLE_ARRAY);
   for (var i = 0; i < PHOTO_QUANTITY; i++) {
     var x = getRandNum(MIN_X, MAX_X);
     var y = getRandNum(MIN_Y, MAX_Y);
@@ -96,11 +98,11 @@ function makeObjectArray() {
       {
         author:
           {
-            avatar: 'img/avatars/user0' + getRandElement(PHOTO_NAME_ARRAY) + '.png'
+            avatar: 'img/avatars/user0' + avatar[i] + '.png'
           },
         offer:
           {
-            title: getRandElement(TITLE_ARRAY),
+            title: title[i],
             address: x + ', ' + y,
             price: getRandNum(MIN_PRICE, MAX_PRICE),
             type: TYPE_RUS[getRandElement(TYPE_ARRAY)],
@@ -463,9 +465,7 @@ function setMapPinMainCoords(x, y) {
 }
 
 // функция управления процессом drag'n'drop
-function dragManager(evt) {
-
-  mapPinMain.style.zIndex = 9999;
+function manageDragNDrop(evt) {
   var startCoords = {
     x: evt.clientX,
     y: evt.clientY
@@ -499,9 +499,5 @@ function dragManager(evt) {
   document.addEventListener('mouseup', onMouseUp);
 }
 
-mapPinMain.addEventListener('mousedown', function () {
-  if (!isMapFaded()) {
-    dragManager(event);
-  }
-});
+mapPinMain.addEventListener('mousedown', manageDragNDrop);
 
