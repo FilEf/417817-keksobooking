@@ -1,11 +1,21 @@
 'use strict';
 
+var MAIN_PIN_START_X = 570;
+var MAIN_PIN_START_Y = 375;
 var adForm = document.querySelector('.ad-form');
+var mapPinMain = document.querySelector('.map__pin--main');
+
 (function () {
   var map = document.querySelector('.map');
   // функция проверки состояния карты
   function isMapFaded() {
     return map.classList.contains('map--faded');
+  }
+
+  // функция назанчения координат пина
+  function setMapPinMainCoords(x, y) {
+    mapPinMain.style.left = x + 'px';
+    mapPinMain.style.top = y + 'px';
   }
 
   // функция разблокировки карты
@@ -19,14 +29,6 @@ var adForm = document.querySelector('.ad-form');
     map.classList.add('map--faded');
     setMapPinMainCoords(MAIN_PIN_START_X, MAIN_PIN_START_Y);
     window.form.setFormDisabled();
-  }
-
-  // функция запуска разблокировки страницы по нажатию на главный указатель
-  function mainPinMouseupHandler() {
-    if (isMapFaded()) {
-      setMapEnabled();
-      window.utils.insertIntoDom(mapPinsContainer, window.pins.makePinsFragment(mapOffers));
-    }
   }
 
   // функция удаления указателей
@@ -45,11 +47,14 @@ var adForm = document.querySelector('.ad-form');
     window.offer.closeOffer();
     adForm.reset();
     setMapDisabled();
+    window.form.inputAddress();
   }
+
   window.page = {
     isMapFaded: isMapFaded,
     resetClickHandler: resetClickHandler,
-    mainPinMouseupHandler: mainPinMouseupHandler
+    setMapEnabled: setMapEnabled,
+    setMapPinMainCoords: setMapPinMainCoords
   };
 })();
 

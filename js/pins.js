@@ -5,6 +5,7 @@ var mapOffers = window.objects.makeObjectArray();
   var PIN_WIDTH = 50;
   var PIN_HEIGHT = 70;
   var offerContainer = document.querySelector('.map');
+
   // функция создания указателя
   var mapPinTemplate = document.querySelector('template').content.querySelector('.map__pin');
 
@@ -33,7 +34,7 @@ var mapOffers = window.objects.makeObjectArray();
     if (pin) {
       var currentIndex = parseInt(pin.dataset.id, 10);
       window.offer.deleteOfferFromDom();
-      window.offer.currentOffer = window.offer.makeOffer(mapOffers[currentIndex]);
+      currentOffer = window.offer.makeOffer(mapOffers[currentIndex]);
       window.utils.insertIntoDom(offerContainer, currentOffer);
       window.offer.addOfferCloseEvtListeners();
     }

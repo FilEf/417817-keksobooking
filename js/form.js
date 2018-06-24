@@ -1,28 +1,11 @@
 'use strict';
 
+var MAIN_PIN_WIDTH = 65;
+var MAIN_PIN_HEIGHT = 65;
+var MAIN_PIN_TAIL = 22;
+var mainPinCenterX = MAIN_PIN_START_X + MAIN_PIN_WIDTH / 2;
+var mainPinCenterY = MAIN_PIN_START_Y + MAIN_PIN_HEIGHT / 2;
 (function () {
-  var addressField = adForm.querySelector('#address');
-  var adFormFieldsets = adForm.querySelectorAll('fieldset');
-  // функция разблокировки формы
-  function setFormEnabled() {
-    adForm.classList.remove('ad-form--disabled');
-    for (var i = 0; i < adFormFieldsets.length; i++) {
-      adFormFieldsets[i].removeAttribute('disabled');
-    }
-  }
-
-  // функция блокировки формы
-  function setFormDisabled() {
-    adForm.classList.add('ad-form--disabled');
-    for (var i = 0; i < adFormFieldsets.length; i++) {
-      adFormFieldsets[i].setAttribute('disabled', '');
-    }
-  }
-  // функция вставки значения в поле адреса
-  function inputAddress() {
-    var mainPinCoords = window.mainpin.getMainPinCoords();
-    addressField.value = mainPinCoords.x + ', ' + mainPinCoords.y;
-  }
   var TYPE_MINPRICE = {
     'bungalo': 0,
     'flat': 1000,
@@ -38,6 +21,44 @@
   var capacity = adForm.querySelector('#capacity');
   var capacityValues = capacity.querySelectorAll('option');
   var resetButton = adForm.querySelector('.ad-form__reset');
+  var addressField = adForm.querySelector('#address');
+  var adFormFieldsets = adForm.querySelectorAll('fieldset');
+
+  // функция разблокировки формы
+  function setFormEnabled() {
+    adForm.classList.remove('ad-form--disabled');
+    for (var i = 0; i < adFormFieldsets.length; i++) {
+      adFormFieldsets[i].removeAttribute('disabled');
+    }
+  }
+
+  // функция блокировки формы
+  function setFormDisabled() {
+    adForm.classList.add('ad-form--disabled');
+    for (var i = 0; i < adFormFieldsets.length; i++) {
+      adFormFieldsets[i].setAttribute('disabled', '');
+    }
+  }
+  // функция вычисления координат главного указателя
+  function getMainPinCoords() {
+    if (window.page.isMapFaded()) {
+      return {
+        x: mainPinCenterX,
+        y: mainPinCenterY
+      };
+    } else {
+      return {
+        x: mapPinMain.offsetLeft + MAIN_PIN_WIDTH / 2,
+        y: mapPinMain.offsetTop + MAIN_PIN_HEIGHT + MAIN_PIN_TAIL
+      };
+    }
+  }
+
+  // функция вставки значения в поле адреса
+  function inputAddress() {
+    var mainPinCoords = getMainPinCoords();
+    addressField.value = mainPinCoords.x + ', ' + mainPinCoords.y;
+  }
 
   // функция, возвращающая мин. цену в зависимости от типа жилья
   function getMinPriceByType(type) {
@@ -95,4 +116,5 @@
     inputAddress: inputAddress
   };
   setFormDisabled();
+  inputAddress(MAIN_PIN_START_X, MAIN_PIN_START_Y);
 })();

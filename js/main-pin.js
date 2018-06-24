@@ -1,12 +1,6 @@
 'use strict';
-var MAIN_PIN_START_X = 570;
-var MAIN_PIN_START_Y = 375;
+
 (function () {
-  var MAIN_PIN_WIDTH = 65;
-  var MAIN_PIN_HEIGHT = 65;
-  var MAIN_PIN_TAIL = 22;
-  var mainPinCenterX = MAIN_PIN_START_X + MAIN_PIN_WIDTH / 2;
-  var mainPinCenterY = MAIN_PIN_START_Y + MAIN_PIN_HEIGHT / 2;
   var LIMITS = {
     left: 0 - MAIN_PIN_WIDTH / 2,
     top: 130 - (MAIN_PIN_HEIGHT + MAIN_PIN_TAIL),
@@ -15,20 +9,6 @@ var MAIN_PIN_START_Y = 375;
   };
   var mapPinMain = document.querySelector('.map__pin--main');
 
-  // функция вычисления координат главного указателя
-  function getMainPinCoords() {
-    if (window.page.isMapFaded()) {
-      return {
-        x: mainPinCenterX,
-        y: mainPinCenterY
-      };
-    } else {
-      return {
-        x: mapPinMain.offsetLeft + MAIN_PIN_WIDTH / 2,
-        y: mapPinMain.offsetTop + MAIN_PIN_HEIGHT + MAIN_PIN_TAIL
-      };
-    }
-  }
   // функция ограничения передвижения пина
   function getNewCoords(x, y) {
     var newCoords = {
@@ -48,11 +28,6 @@ var MAIN_PIN_START_Y = 375;
       newCoords.y = LIMITS.bottom;
     }
     return newCoords;
-  }
-  // функция назанчения координат пина
-  function setMapPinMainCoords(x, y) {
-    mapPinMain.style.left = x + 'px';
-    mapPinMain.style.top = y + 'px';
   }
 
   // функция управления процессом drag'n'drop
@@ -76,8 +51,8 @@ var MAIN_PIN_START_Y = 375;
       var actualX = mapPinMain.offsetLeft - shift.x;
       var actualY = mapPinMain.offsetTop - shift.y;
       var newCoords = getNewCoords(actualX, actualY);
-      window.form.inputAddress(startCoords.x, startCoords.y);
-      setMapPinMainCoords(newCoords.x, newCoords.y);
+      window.form.inputAddress();
+      window.page.setMapPinMainCoords(newCoords.x, newCoords.y);
     }
     // Функция обработки отпускания пина
     function onMouseUp(upEvt) {
@@ -89,9 +64,15 @@ var MAIN_PIN_START_Y = 375;
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
   }
-  mapPinMain.addEventListener('mouseup', window.page.mainPinMouseupHandler);
+
+  // функция запуска разблокировки страницы по нажатию на главный указатель
+  function mainPinMouseupHandler() {
+    if (window.page.isMapFaded()) {
+      window.page.setMapEnabled();
+      window.utils.insertIntoDom(mapPinsContainer, window.pins.makePinsFragment(mapOffers));
+      window.form.inputAddress();
+    }
+  }
+  mapPinMain.addEventListener('mouseup', mainPinMouseupHandler);
   mapPinMain.addEventListener('mousedown', dragNDropHandler);
-  window.mainpin = {
-    getMainPinCoords: getMainPinCoords
-  };
 })();
