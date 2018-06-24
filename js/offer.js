@@ -1,10 +1,11 @@
 'use strict';
 
-var currentOffer; // нужна и здесь, и в pins. не могу придумать, как переделать
 (function () {
   var PHOTO_WIDTH = 45;
   var PHOTO_HEIGHT = 40;
   var ESC_CODE = 27;
+
+  var currentOffer;
   // функция создания фрагмента со списком удобств
   function makeFeaturesFragment(array) {
     var featuresFragment = document.createDocumentFragment();
@@ -50,6 +51,7 @@ var currentOffer; // нужна и здесь, и в pins. не могу при�
     offer.querySelector('.popup__photos').innerHTML = '';
     window.utils.insertIntoDom(ulContainer, makeFeaturesFragment(arrayObject.offer.features));
     window.utils.insertIntoDom(photoContainer, makePhotosFragment(arrayObject.offer.photos));
+    currentOffer = offer;
     return offer;
   }
 

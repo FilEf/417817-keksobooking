@@ -84,7 +84,10 @@
     }
     return objectArray;
   }
+  makeObjectArray();
+
   window.objects = {
-    makeObjectArray: makeObjectArray
+    mapOffers: objectArray
   };
 })();
+

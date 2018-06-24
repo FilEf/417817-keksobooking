@@ -2,6 +2,12 @@
 
 (function () {
   var map = document.querySelector('.map');
+  var mapPinsContainer = document.querySelector('.map__pins');
+
+  function getPinsContainer() {
+    return mapPinsContainer;
+  }
+
   // функция проверки состояния карты
   function isMapFaded() {
     return map.classList.contains('map--faded');
@@ -19,21 +25,24 @@
     window.form.setFormDisabled();
   }
 
-  // функция удаления указателей
-  function deletePins() {
-    var pins = map.querySelectorAll('.map__pin:not(.map__pin--main)');
-    var i = 0;
-    while (i < pins.length) {
-      pins[i].remove();
-      i++;
+  // функция открытия подробной информации о предложении по нажатию на одну из меток
+  function pinClickHandler(evt) {
+    var pin = evt.target.closest('.map__pin:not(.map__pin--main)');
+    if (pin) {
+      var currentIndex = parseInt(pin.dataset.id, 10);
+      window.offer.deleteOfferFromDom();
+      var currentOffer = window.offer.makeOffer(window.objects.mapOffers[currentIndex]);
+      window.utils.insertIntoDom(map, currentOffer);
+      window.offer.addOfferCloseEvtListeners();
     }
   }
+  mapPinsContainer.addEventListener('click', pinClickHandler);
 
   window.main = {
+    getPinsContainer: getPinsContainer,
     isMapFaded: isMapFaded,
     setMapEnabled: setMapEnabled,
-    setMapDisabled: setMapDisabled,
-    deletePins: deletePins
+    setMapDisabled: setMapDisabled
   };
 })();
 

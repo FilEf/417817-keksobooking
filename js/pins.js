@@ -1,11 +1,9 @@
 'use strict';
 
-var mapOffers = window.objects.makeObjectArray(); // нужна и здесь и в main-pin. не могу придумать, как переделать
-var mapPinsContainer = document.querySelector('.map__pins'); // нужна и здесь и в main-pin. не могу придумать, как переделать
 (function () {
   var PIN_WIDTH = 50;
   var PIN_HEIGHT = 70;
-  var offerContainer = document.querySelector('.map');
+  var pins = [];
 
   // функция создания указателя
   var mapPinTemplate = document.querySelector('template').content.querySelector('.map__pin');
@@ -24,24 +22,25 @@ var mapPinsContainer = document.querySelector('.map__pins'); // нужна и з
   function makePinsFragment(array) {
     var pinsFragment = document.createDocumentFragment();
     for (var i = 0; i < array.length; i++) {
-      pinsFragment.appendChild(makePin(array[i], i));
+      var newPin = makePin(array[i], i);
+      pins.push(newPin);
+      pinsFragment.appendChild(newPin);
     }
     return pinsFragment;
   }
 
-  // функция открытия подробной информации о предложении по нажатию на одну из меток
-  function pinClickHandler(evt) {
-    var pin = evt.target.closest('.map__pin:not(.map__pin--main)');
-    if (pin) {
-      var currentIndex = parseInt(pin.dataset.id, 10);
-      window.offer.deleteOfferFromDom();
-      currentOffer = window.offer.makeOffer(mapOffers[currentIndex]);
-      window.utils.insertIntoDom(offerContainer, currentOffer);
-      window.offer.addOfferCloseEvtListeners();
+  // функция удаления указателей
+  function deletePins() {
+    var i = 0;
+    while (i < pins.length) {
+      pins[i].remove();
+      i++;
     }
+    pins = [];
   }
-  mapPinsContainer.addEventListener('click', pinClickHandler);
+
   window.pins = {
-    makePinsFragment: makePinsFragment
+    makePinsFragment: makePinsFragment,
+    deletePins: deletePins
   };
 })();

@@ -82,12 +82,11 @@
 
   // функция обработчик нажатия на кнопку reset
   function resetClickHandler() {
-    window.main.deletePins();
+    window.pins.deletePins();
     window.offer.closeOffer();
     adForm.reset();
     window.main.setMapDisabled();
     window.mainPin.setMapPinMainCoords();
-    inputAddress(window.mainPin.getMainPinCoords()); // не сработает, потому что она еще не объявлена
   }
 
   // функция запуска обработчиков событий на форме
