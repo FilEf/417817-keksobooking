@@ -1,4 +1,5 @@
 'use strict';
+
 (function () {
   // аватарка
   var PHOTO_QUANTITY = 8;

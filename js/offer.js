@@ -1,6 +1,6 @@
 'use strict';
-var currentOffer;
 
+var currentOffer; // нужна и здесь, и в pins. не могу придумать, как переделать
 (function () {
   var PHOTO_WIDTH = 45;
   var PHOTO_HEIGHT = 40;
@@ -52,6 +52,7 @@ var currentOffer;
     window.utils.insertIntoDom(photoContainer, makePhotosFragment(arrayObject.offer.photos));
     return offer;
   }
+
   // функция удаления предложения из DOM
   function deleteOfferFromDom() {
     if (currentOffer) {

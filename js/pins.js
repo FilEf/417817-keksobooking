@@ -1,6 +1,7 @@
 'use strict';
-var mapPinsContainer = document.querySelector('.map__pins');
-var mapOffers = window.objects.makeObjectArray();
+
+var mapOffers = window.objects.makeObjectArray(); // нужна и здесь и в main-pin. не могу придумать, как переделать
+var mapPinsContainer = document.querySelector('.map__pins'); // нужна и здесь и в main-pin. не могу придумать, как переделать
 (function () {
   var PIN_WIDTH = 50;
   var PIN_HEIGHT = 70;

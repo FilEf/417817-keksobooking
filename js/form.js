@@ -1,10 +1,5 @@
 'use strict';
 
-var MAIN_PIN_WIDTH = 65;
-var MAIN_PIN_HEIGHT = 65;
-var MAIN_PIN_TAIL = 22;
-var mainPinCenterX = MAIN_PIN_START_X + MAIN_PIN_WIDTH / 2;
-var mainPinCenterY = MAIN_PIN_START_Y + MAIN_PIN_HEIGHT / 2;
 (function () {
   var TYPE_MINPRICE = {
     'bungalo': 0,
@@ -12,7 +7,7 @@ var mainPinCenterY = MAIN_PIN_START_Y + MAIN_PIN_HEIGHT / 2;
     'house': 5000,
     'palace': 10000
   };
-
+  var adForm = document.querySelector('.ad-form');
   var priceInput = adForm.querySelector('#price');
   var typeInput = adForm.querySelector('#type');
   var timein = adForm.querySelector('#timein');
@@ -39,25 +34,10 @@ var mainPinCenterY = MAIN_PIN_START_Y + MAIN_PIN_HEIGHT / 2;
       adFormFieldsets[i].setAttribute('disabled', '');
     }
   }
-  // функция вычисления координат главного указателя
-  function getMainPinCoords() {
-    if (window.page.isMapFaded()) {
-      return {
-        x: mainPinCenterX,
-        y: mainPinCenterY
-      };
-    } else {
-      return {
-        x: mapPinMain.offsetLeft + MAIN_PIN_WIDTH / 2,
-        y: mapPinMain.offsetTop + MAIN_PIN_HEIGHT + MAIN_PIN_TAIL
-      };
-    }
-  }
 
   // функция вставки значения в поле адреса
-  function inputAddress() {
-    var mainPinCoords = getMainPinCoords();
-    addressField.value = mainPinCoords.x + ', ' + mainPinCoords.y;
+  function inputAddress(coords) {
+    addressField.value = coords.x + ', ' + coords.y;
   }
 
   // функция, возвращающая мин. цену в зависимости от типа жилья
@@ -100,21 +80,31 @@ var mainPinCenterY = MAIN_PIN_START_Y + MAIN_PIN_HEIGHT / 2;
     syncronizeCapacityByRoomNumbers(roomValue);
   }
 
+  // функция обработчик нажатия на кнопку reset
+  function resetClickHandler() {
+    window.main.deletePins();
+    window.offer.closeOffer();
+    adForm.reset();
+    window.main.setMapDisabled();
+    window.mainPin.setMapPinMainCoords();
+    inputAddress(window.mainPin.getMainPinCoords()); // не сработает, потому что она еще не объявлена
+  }
+
   // функция запуска обработчиков событий на форме
   function addFormListeners() {
     typeInput.addEventListener('change', typeInputChangeHandler);
     timein.addEventListener('change', timeinInputChangeHandler);
     timeout.addEventListener('change', timeoutInputChangeHandler);
     roomNumber.addEventListener('change', roomNumberChangeHandler);
-    resetButton.addEventListener('click', window.page.resetClickHandler);
+    resetButton.addEventListener('click', resetClickHandler);
   }
 
   addFormListeners();
+  setFormDisabled();
+
   window.form = {
     setFormEnabled: setFormEnabled,
     setFormDisabled: setFormDisabled,
     inputAddress: inputAddress
   };
-  setFormDisabled();
-  inputAddress(MAIN_PIN_START_X, MAIN_PIN_START_Y);
 })();
