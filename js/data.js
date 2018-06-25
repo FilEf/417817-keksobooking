@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-  // аватарка
+/*  // аватарка
   var PHOTO_QUANTITY = 8;
   var PHOTO_NAME_ARRAY = [1, 2, 3, 4, 5, 6, 7, 8];
 
@@ -45,9 +45,9 @@
   var MIN_Y = 130;
   var MAX_X = 900;
   var MAX_Y = 630;
-
-  var objectArray = [];
-
+*/
+  var objects = [];
+/*
   // функция для заполнения свойств объекта
   function makeObjectArray() {
     var avatar = window.utils.getShuffledArray(PHOTO_NAME_ARRAY);
@@ -85,9 +85,23 @@
     return objectArray;
   }
   makeObjectArray();
+*/
 
-  window.objects = {
-    mapOffers: objectArray
+  function xhrSuccessHandler(array) {
+    console.log(array);
+  }
+
+  function xhrErrorHandler(errorMessage) {
+    window.getErrorMessage(errorMessage);
+  }
+
+  function getObjectArray() {
+    objects = window.backend.load(xhrSuccessHandler, xhrErrorHandler);
+  }
+  getObjectArray();
+
+  window.data = {
+    mapOffers: objects
   };
 })();
 

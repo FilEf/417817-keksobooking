@@ -99,7 +99,7 @@
   function mainPinMouseupHandler() {
     if (window.main.isMapFaded()) {
       window.main.setMapEnabled();
-      window.utils.insertIntoDom(window.main.getPinsContainer(), window.pins.makePinsFragment(window.objects.mapOffers));
+      window.utils.insertIntoDom(window.main.getPinsContainer(), window.pins.makePinsFragment(window.data.mapOffers));
       window.form.inputAddress(getMainPinCoords());
     }
   }
