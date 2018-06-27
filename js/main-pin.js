@@ -15,6 +15,7 @@
     bottom: 630 - (MAIN_PIN_HEIGHT + MAIN_PIN_TAIL)
   };
   var mapPinMain = document.querySelector('.map__pin--main');
+  var offers = [];
 
   // функция вычисления координат главного указателя
   function getMainPinCoords() {
@@ -96,18 +97,30 @@
   }
 
   // функция запуска разблокировки страницы по нажатию на главный указатель
-  function mainPinMouseupHandler() {
+  function xhrSuccessHandler(objects) {
     if (window.main.isMapFaded()) {
+      offers = objects;
       window.main.setMapEnabled();
-      window.utils.insertIntoDom(window.main.getPinsContainer(), window.pins.makePinsFragment(window.data.mapOffers));
+      window.utils.insertIntoDom(window.main.getPinsContainer(), window.pins.makePinsFragment(objects));
       window.form.inputAddress(getMainPinCoords());
+      console.log(offers);
     }
   }
+
+  function xhrErrorHandler(error) {
+    alert(error);
+  }
+
+  function mainPinMouseupHandler() {
+    window.backend.load(xhrSuccessHandler, xhrErrorHandler);
+  }
+
   mapPinMain.addEventListener('mouseup', mainPinMouseupHandler);
   mapPinMain.addEventListener('mousedown', dragNDropHandler);
   window.form.inputAddress(getMainPinCoords());
 
   window.mainPin = {
-    setMapPinMainCoords: setMapPinMainCoords
+    setMapPinMainCoords: setMapPinMainCoords,
+    xhrSuccessHandler: offers
   };
 })();

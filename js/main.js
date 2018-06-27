@@ -31,7 +31,8 @@
     if (pin) {
       var currentIndex = parseInt(pin.dataset.id, 10);
       window.offer.deleteOfferFromDom();
-      var currentOffer = window.offer.makeOffer(window.data.mapOffers[currentIndex]);
+      console.log(window.mainPin.xhrSuccessHandler);
+      var currentOffer = window.offer.makeOffer(window.mainPin.xhrSuccessHandler[currentIndex]);
       window.utils.insertIntoDom(map, currentOffer);
       window.offer.addOfferCloseEvtListeners();
     }

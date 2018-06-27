@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-/*  // аватарка
+  // аватарка
   var PHOTO_QUANTITY = 8;
   var PHOTO_NAME_ARRAY = [1, 2, 3, 4, 5, 6, 7, 8];
 
@@ -45,9 +45,9 @@
   var MIN_Y = 130;
   var MAX_X = 900;
   var MAX_Y = 630;
-*/
+
   var objects = [];
-/*
+
   // функция для заполнения свойств объекта
   function makeObjectArray() {
     var avatar = window.utils.getShuffledArray(PHOTO_NAME_ARRAY);
@@ -55,7 +55,7 @@
     for (var i = 0; i < PHOTO_QUANTITY; i++) {
       var x = window.utils.getRandNum(MIN_X, MAX_X);
       var y = window.utils.getRandNum(MIN_Y, MAX_Y);
-      objectArray[i] =
+      objects[i] =
         {
           author:
             {
@@ -82,23 +82,9 @@
             }
         };
     }
-    return objectArray;
+    return objects;
   }
   makeObjectArray();
-*/
-
-  function xhrSuccessHandler(array) {
-    console.log(array);
-  }
-
-  function xhrErrorHandler(errorMessage) {
-    window.getErrorMessage(errorMessage);
-  }
-
-  function getObjectArray() {
-    objects = window.backend.load(xhrSuccessHandler, xhrErrorHandler);
-  }
-  getObjectArray();
 
   window.data = {
     mapOffers: objects
