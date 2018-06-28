@@ -1,28 +1,26 @@
 'use strict';
 
 (function () {
-  var map = document.querySelector('.map');
-  var mapPinsContainer = document.querySelector('.map__pins');
+  var offers = [];
 
-  function getPinsContainer() {
-    return mapPinsContainer;
+  // функция обработчик нажатия на кнопку reset
+  function resetPage() {
+    window.pins.deleteAll();
+    window.offer.closeOffer();
+    window.map.setDisabled();
+    window.mainPin.setCoords();
   }
 
-  // функция проверки состояния карты
-  function isMapFaded() {
-    return map.classList.contains('map--faded');
+  // функция запуска разблокировки страницы по нажатию на главный указатель
+  function xhrSuccessHandler(objects) {
+    offers = objects;
+    window.map.setEnabled();
+    window.utils.insertIntoDom(window.map.getPinsContainer(), window.pins.makeFragment(objects));
+    window.form.inputAddress(window.mainPin.getCoords());
   }
 
-  // функция разблокировки карты
-  function setMapEnabled() {
-    map.classList.remove('map--faded');
-    window.form.setFormEnabled();
-  }
-
-  // функция блокировки карты
-  function setMapDisabled() {
-    map.classList.add('map--faded');
-    window.form.setFormDisabled();
+  function xhrErrorHandler(error) {
+    alert(error);
   }
 
   // функция открытия подробной информации о предложении по нажатию на одну из меток
@@ -31,19 +29,13 @@
     if (pin) {
       var currentIndex = parseInt(pin.dataset.id, 10);
       window.offer.deleteOfferFromDom();
-      console.log(window.mainPin.xhrSuccessHandler);
-      var currentOffer = window.offer.makeOffer(window.mainPin.xhrSuccessHandler[currentIndex]);
-      window.utils.insertIntoDom(map, currentOffer);
+      var currentOffer = window.offer.makeOffer(offers[currentIndex]);
+      window.utils.insertIntoDom(window.map.get(), currentOffer);
       window.offer.addOfferCloseEvtListeners();
     }
   }
-  mapPinsContainer.addEventListener('click', pinClickHandler);
-
-  window.main = {
-    getPinsContainer: getPinsContainer,
-    isMapFaded: isMapFaded,
-    setMapEnabled: setMapEnabled,
-    setMapDisabled: setMapDisabled
-  };
+  window.mainPin.setMouseUpListener(xhrSuccessHandler, xhrErrorHandler);
+  window.map.setContainerListener(pinClickHandler);
+  window.form.setListenerToReset(resetPage);
 })();
 

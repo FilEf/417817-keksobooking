@@ -80,13 +80,12 @@
     syncronizeCapacityByRoomNumbers(roomValue);
   }
 
-  // функция обработчик нажатия на кнопку reset
-  function resetClickHandler() {
-    window.pins.deletePins();
-    window.offer.closeOffer();
-    adForm.reset();
-    window.main.setMapDisabled();
-    window.mainPin.setMapPinMainCoords();
+  function setListenerToReset(callback) {
+    resetButton.addEventListener('click', function () {
+      callback();
+      adForm.reset();
+      inputAddress(window.mainPin.getCoords());
+    });
   }
 
   // функция запуска обработчиков событий на форме
@@ -95,7 +94,6 @@
     timein.addEventListener('change', timeinInputChangeHandler);
     timeout.addEventListener('change', timeoutInputChangeHandler);
     roomNumber.addEventListener('change', roomNumberChangeHandler);
-    resetButton.addEventListener('click', resetClickHandler);
   }
 
   addFormListeners();
@@ -104,6 +102,7 @@
   window.form = {
     setFormEnabled: setFormEnabled,
     setFormDisabled: setFormDisabled,
-    inputAddress: inputAddress
+    inputAddress: inputAddress,
+    setListenerToReset: setListenerToReset
   };
 })();
