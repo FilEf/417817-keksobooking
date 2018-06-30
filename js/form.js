@@ -96,8 +96,8 @@
     evt.preventDefault();
     if (evt.keyCode === ESC_CODE || evt.button || evt.which) {
       successMessage.classList.add('hidden');
-      document.removeEventListener('click');
-      document.removeEventListener('keydown');
+      document.removeEventListener('click', hideSuccessMessage);
+      document.removeEventListener('keydown', hideSuccessMessage);
     }
   }
   // функция показа окна с сообщением об успешной загрузке
