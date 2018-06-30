@@ -6,8 +6,6 @@
   var MAIN_PIN_WIDTH = 65;
   var MAIN_PIN_HEIGHT = 65;
   var MAIN_PIN_TAIL = 22;
-  var mainPinCenterX = Math.round(MAIN_PIN_START_X + MAIN_PIN_WIDTH / 2);
-  var mainPinCenterY = Math.round(MAIN_PIN_START_Y + MAIN_PIN_HEIGHT / 2);
   var LIMITS = {
     left: 0 - MAIN_PIN_WIDTH / 2,
     top: 130 - (MAIN_PIN_HEIGHT + MAIN_PIN_TAIL),
@@ -17,11 +15,11 @@
   var mapPinMain = document.querySelector('.map__pin--main');
 
   // функция вычисления координат главного указателя
-  function getMainPinCoords() {
+  function getAddress() {
     if (window.map.isFaded()) {
       return {
-        x: mainPinCenterX,
-        y: mainPinCenterY
+        x: Math.round(mapPinMain.offsetLeft + MAIN_PIN_WIDTH / 2),
+        y: Math.round(mapPinMain.offsetTop + MAIN_PIN_HEIGHT / 2)
       };
     } else {
       return {
@@ -81,7 +79,7 @@
       var actualX = mapPinMain.offsetLeft - shift.x;
       var actualY = mapPinMain.offsetTop - shift.y;
       var newCoords = getNewCoords(actualX, actualY);
-      window.form.inputAddress(getMainPinCoords());
+      window.form.inputAddress(getAddress());
       setMainPinCoords(newCoords.x, newCoords.y);
     }
     // Функция обработки отпускания пина
@@ -95,20 +93,29 @@
     document.addEventListener('mouseup', onMouseUp);
   }
 
-  function setMouseUpListener(successCallback, errorCallback) {
-    function mainPinMouseupHandler() {
-      window.backend.load(successCallback, errorCallback);
-      mapPinMain.removeEventListener('mouseup', mainPinMouseupHandler);
-    }
-    mapPinMain.addEventListener('mouseup', mainPinMouseupHandler);
+  var onMouseUpCallback = null;
+
+  function mainPinMouseUpHandler() {
+    onMouseUpCallback();
+    mapPinMain.removeEventListener('mouseup', mainPinMouseUpHandler);
   }
 
+  function setMouseUpCallback(callback) {
+    onMouseUpCallback = callback;
+  }
+
+  function setMainPinMouseUpListener() {
+    mapPinMain.addEventListener('mouseup', mainPinMouseUpHandler);
+  }
+
+  setMainPinMouseUpListener();
   mapPinMain.addEventListener('mousedown', dragNDropHandler);
-  window.form.inputAddress(getMainPinCoords());
+  window.form.inputAddress(getAddress());
 
   window.mainPin = {
-    getCoords: getMainPinCoords,
+    getCoords: getAddress,
     setCoords: setMainPinCoords,
-    setMouseUpListener: setMouseUpListener
+    setMouseUpCallback: setMouseUpCallback,
+    setMouseUpListener: setMainPinMouseUpListener
   };
 })();

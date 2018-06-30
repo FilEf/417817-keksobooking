@@ -9,6 +9,7 @@
     window.offer.closeOffer();
     window.map.setDisabled();
     window.mainPin.setCoords();
+    window.mainPin.setMouseUpListener();
   }
 
   // функция запуска разблокировки страницы по нажатию на главный указатель
@@ -23,6 +24,10 @@
     alert(error);
   }
 
+  function tryLoad() {
+    window.backend.load(xhrSuccessHandler, xhrErrorHandler);
+  }
+
   // функция открытия подробной информации о предложении по нажатию на одну из меток
   function pinClickHandler(evt) {
     var pin = evt.target.closest('.map__pin:not(.map__pin--main)');
@@ -34,7 +39,7 @@
       window.offer.addOfferCloseEvtListeners();
     }
   }
-  window.mainPin.setMouseUpListener(xhrSuccessHandler, xhrErrorHandler);
+  window.mainPin.setMouseUpCallback(tryLoad);
   window.map.setContainerListener(pinClickHandler);
   window.form.setListenerToReset(resetPage);
 })();
