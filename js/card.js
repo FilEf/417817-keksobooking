@@ -93,7 +93,7 @@
       closeOffer();
     }
   }
-  window.offer = {
+  window.card = {
     makeOffer: makeOffer,
     closeOffer: closeOffer,
     deleteOfferFromDom: deleteOfferFromDom,

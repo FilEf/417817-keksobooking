@@ -46,7 +46,7 @@
   var MAX_X = 900;
   var MAX_Y = 630;
 
-  var objectArray = [];
+  var objects = [];
 
   // функция для заполнения свойств объекта
   function makeObjectArray() {
@@ -55,7 +55,7 @@
     for (var i = 0; i < PHOTO_QUANTITY; i++) {
       var x = window.utils.getRandNum(MIN_X, MAX_X);
       var y = window.utils.getRandNum(MIN_Y, MAX_Y);
-      objectArray[i] =
+      objects[i] =
         {
           author:
             {
@@ -82,12 +82,12 @@
             }
         };
     }
-    return objectArray;
+    return objects;
   }
   makeObjectArray();
 
-  window.objects = {
-    mapOffers: objectArray
+  window.data = {
+    mapOffers: objects
   };
 })();
 

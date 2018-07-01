@@ -1,28 +1,47 @@
 'use strict';
 
 (function () {
-  var map = document.querySelector('.map');
-  var mapPinsContainer = document.querySelector('.map__pins');
+  var offers = [];
 
-  function getPinsContainer() {
-    return mapPinsContainer;
+  // функция обработчик нажатия на кнопку reset
+  function resetPage() {
+    window.pins.deleteAll();
+    window.card.closeOffer();
+    window.map.setDisabled();
+    window.mainPin.setCoords();
+    window.mainPin.setMouseUpListener();
   }
 
-  // функция проверки состояния карты
-  function isMapFaded() {
-    return map.classList.contains('map--faded');
+  // функция-обработчик успешной загрузки данных
+  function xhrSuccessLoadHandler(objects) {
+    offers = objects;
+    window.map.setEnabled();
+    window.utils.insertIntoDom(window.map.getPinsContainer(), window.pins.makeFragment(objects));
+    window.form.inputAddress(window.mainPin.getCoords());
   }
 
-  // функция разблокировки карты
-  function setMapEnabled() {
-    map.classList.remove('map--faded');
-    window.form.setFormEnabled();
+  function xhrSuccessUpLoadHandler() {
+    resetPage();
+    window.form.showSuccessMessage();
   }
 
-  // функция блокировки карты
-  function setMapDisabled() {
-    map.classList.add('map--faded');
-    window.form.setFormDisabled();
+  function xhrErrorHandler(error) {
+    var node = document.createElement('div');
+    node.className = 'error-message';
+    node.style = 'top: 0; left: 0; z-index: 200; width: 100%; height: 100%; background-color: rgba(255, 0, 0, 0.6); vertical-align: middle;';
+    node.style.position = 'fixed';
+    node.style.paddingTop = '500px';
+    node.style.textAlign = 'center';
+    node.style.fontSize = '50px';
+    node.textContent = error;
+    document.body.insertAdjacentElement('afterbegin', node);
+    setTimeout(function () {
+      node.remove();
+    }, 2000);
+  }
+
+  function tryLoad() {
+    window.backend.load(xhrSuccessLoadHandler, xhrErrorHandler);
   }
 
   // функция открытия подробной информации о предложении по нажатию на одну из меток
@@ -30,19 +49,15 @@
     var pin = evt.target.closest('.map__pin:not(.map__pin--main)');
     if (pin) {
       var currentIndex = parseInt(pin.dataset.id, 10);
-      window.offer.deleteOfferFromDom();
-      var currentOffer = window.offer.makeOffer(window.objects.mapOffers[currentIndex]);
-      window.utils.insertIntoDom(map, currentOffer);
-      window.offer.addOfferCloseEvtListeners();
+      window.card.deleteOfferFromDom();
+      var currentOffer = window.offer.makeOffer(offers[currentIndex]);
+      window.utils.insertIntoDom(window.map.get(), currentOffer);
+      window.card.addOfferCloseEvtListeners();
     }
   }
-  mapPinsContainer.addEventListener('click', pinClickHandler);
-
-  window.main = {
-    getPinsContainer: getPinsContainer,
-    isMapFaded: isMapFaded,
-    setMapEnabled: setMapEnabled,
-    setMapDisabled: setMapDisabled
-  };
+  window.mainPin.setMouseUpCallback(tryLoad);
+  window.map.setContainerListener(pinClickHandler);
+  window.form.setListenerToReset(resetPage);
+  window.form.getSuccessErrorFuctions(xhrSuccessUpLoadHandler, xhrErrorHandler);
 })();
 

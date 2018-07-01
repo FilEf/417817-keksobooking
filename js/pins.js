@@ -4,9 +4,9 @@
   var PIN_WIDTH = 50;
   var PIN_HEIGHT = 70;
   var pins = [];
+  var mapPinTemplate = document.querySelector('template').content.querySelector('.map__pin');
 
   // функция создания указателя
-  var mapPinTemplate = document.querySelector('template').content.querySelector('.map__pin');
 
   function makePin(arrayObject, i) {
     var pin = mapPinTemplate.cloneNode(true);
@@ -40,7 +40,7 @@
   }
 
   window.pins = {
-    makePinsFragment: makePinsFragment,
-    deletePins: deletePins
+    makeFragment: makePinsFragment,
+    deleteAll: deletePins
   };
 })();
