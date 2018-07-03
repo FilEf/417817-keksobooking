@@ -3,7 +3,7 @@
 (function () {
   var PIN_WIDTH = 50;
   var PIN_HEIGHT = 70;
-  var PIN_NUMBER = 5
+  var PIN_NUMBER = 5;
   var pins = [];
   var mapPinTemplate = document.querySelector('template').content.querySelector('.map__pin');
 

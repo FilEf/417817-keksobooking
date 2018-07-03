@@ -29,21 +29,22 @@
     }
   };
 
+
   function findSameHouseType(object) {
     return object.offer.type === selects.type.value || selects.type.value === DEFAULT_FILTER_VALUE;
   }
   function findSamePrice(object) {
-    return priceFilters[selects.price.value](object);
+    return priceFilters[selects.price.value](object) || selects.price.value === DEFAULT_FILTER_VALUE;
   }
   function findSameRoomsNumbers(object) {
-    return object.offer.rooms === selects.room.value || selects.room.value === DEFAULT_FILTER_VALUE;
+    return object.offer.rooms === +selects.room.value || selects.room.value === DEFAULT_FILTER_VALUE;
   }
   function findSameCapacity(object) {
-    return object.offer.guests === selects.capacity.value || selects.capacity.value === DEFAULT_FILTER_VALUE;
+    return object.offer.guests === +selects.capacity.value || selects.capacity.value === DEFAULT_FILTER_VALUE;
   }
   function findSameFeatures(object) {
-    featureCheckboxes.forEach(function (feature) {
-      return feature.checked && feature.value in object.offer.features;
+    Array.from(featureCheckboxes).some(function (feature) {
+      return feature.checked && object.offer.features.includes(feature.value);
     });
   }
   function getData(objects) {
@@ -64,8 +65,10 @@
   function updateMap() {
     applyFilter(offers);
     console.log(filteredOffers);
-    /*window.pins.deleteAll();
-    window.utils.insertIntoDom(window.map.getPinsContainer(), window.pins.makeFragment(filteredOffers));*/
+    window.pins.deleteAll();
+    if (filteredOffers) {
+      window.utils.insertIntoDom(window.map.getPinsContainer(), window.pins.makeFragment(filteredOffers));
+    }
   }
 
   filterContainer.addEventListener('change', window.utils.debounce(updateMap));
