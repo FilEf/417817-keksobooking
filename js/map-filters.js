@@ -8,12 +8,13 @@
   };
   var offers = [];
   var filteredOffers = [];
-
   var filterContainer = document.querySelector('.map__filters');
-  var houseTypeSelect = filterContainer.querySelector('#housing-type');
-  var pricesSelect = filterContainer.querySelector('#housing-price');
-  var roomsSelect = filterContainer.querySelector('#housing-rooms');
-  var capacitySelect = filterContainer.querySelector('#housing-guests');
+  var selects = {
+    type: filterContainer.querySelector('#housing-type'),
+    price: filterContainer.querySelector('#housing-price'),
+    room: filterContainer.querySelector('#housing-rooms'),
+    capacity: filterContainer.querySelector('#housing-guests'),
+  };
   var featureCheckboxes = filterContainer.querySelectorAll('.map__checkbox');
 
   var priceFilters = {
@@ -29,16 +30,16 @@
   };
 
   function findSameHouseType(object) {
-    return object.offer.type === houseTypeSelect.value || houseTypeSelect.value === DEFAULT_FILTER_VALUE;
+    return object.offer.type === selects.type.value || selects.type.value === DEFAULT_FILTER_VALUE;
   }
   function findSamePrice(object) {
-    return priceFilters[pricesSelect.value](object);
+    return priceFilters[selects.price.value](object);
   }
   function findSameRoomsNumbers(object) {
-    return object.offer.rooms === roomsSelect.value || roomsSelect.value === DEFAULT_FILTER_VALUE;
+    return object.offer.rooms === selects.room.value || selects.room.value === DEFAULT_FILTER_VALUE;
   }
   function findSameCapacity(object) {
-    return object.offer.guests === capacitySelect.value || capacitySelect.value === DEFAULT_FILTER_VALUE;
+    return object.offer.guests === selects.capacity.value || selects.capacity.value === DEFAULT_FILTER_VALUE;
   }
   function findSameFeatures(object) {
     featureCheckboxes.forEach(function (feature) {
@@ -62,8 +63,9 @@
 
   function updateMap() {
     applyFilter(offers);
-    window.pins.deleteAll();
-    window.utils.insertIntoDom(window.map.getPinsContainer(), window.pins.makeFragment(filteredOffers));
+    console.log(filteredOffers);
+    /*window.pins.deleteAll();
+    window.utils.insertIntoDom(window.map.getPinsContainer(), window.pins.makeFragment(filteredOffers));*/
   }
 
   filterContainer.addEventListener('change', window.utils.debounce(updateMap));
