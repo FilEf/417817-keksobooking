@@ -114,7 +114,7 @@
     window.backend.upload(new FormData(adForm), onSuccessCallback, onErrorCallback);
   }
 
-  function getSuccessErrorFuctions(onSuccess, onError) {
+  function getSuccessErrorFunctions(onSuccess, onError) {
     onSuccessCallback = onSuccess;
     onErrorCallback = onError;
   }
@@ -137,6 +137,6 @@
     inputAddress: inputAddress,
     setListenerToReset: setListenerToReset,
     showSuccessMessage: showSuccessMessage,
-    getSuccessErrorFuctions: getSuccessErrorFuctions
+    getSuccessErrorFunctions: getSuccessErrorFunctions
   };
 })();

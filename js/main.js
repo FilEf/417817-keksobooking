@@ -18,6 +18,7 @@
     window.map.setEnabled();
     window.utils.insertIntoDom(window.map.getPinsContainer(), window.pins.makeFragment(objects));
     window.form.inputAddress(window.mainPin.getCoords());
+    window.mapFilters.getData(objects);
   }
 
   function xhrSuccessUpLoadHandler() {
@@ -58,6 +59,6 @@
   window.mainPin.setMouseUpCallback(tryLoad);
   window.map.setContainerListener(pinClickHandler);
   window.form.setListenerToReset(resetPage);
-  window.form.getSuccessErrorFuctions(xhrSuccessUpLoadHandler, xhrErrorHandler);
+  window.form.getSuccessErrorFunctions(xhrSuccessUpLoadHandler, xhrErrorHandler);
 })();
 

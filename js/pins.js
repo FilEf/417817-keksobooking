@@ -3,6 +3,7 @@
 (function () {
   var PIN_WIDTH = 50;
   var PIN_HEIGHT = 70;
+  var PIN_NUMBER = 5
   var pins = [];
   var mapPinTemplate = document.querySelector('template').content.querySelector('.map__pin');
 
@@ -21,7 +22,7 @@
   // функция создания фрагмента с указателями
   function makePinsFragment(array) {
     var pinsFragment = document.createDocumentFragment();
-    for (var i = 0; i < array.length; i++) {
+    for (var i = 0; i < PIN_NUMBER; i++) {
       var newPin = makePin(array[i], i);
       pins.push(newPin);
       pinsFragment.appendChild(newPin);

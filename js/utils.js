@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var DEBOUNCE_INTERVAL = 500;
+
   // функция-генератор случайных чисел
   function getRandNum(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -41,12 +43,29 @@
   function insertIntoDom(container, element) {
     container.appendChild(element);
   }
+
+  // функция дебаунса
+  function debounce(fun) {
+    var lastTimeout = null;
+
+    return function () {
+      var args = arguments;
+      if (lastTimeout) {
+        window.clearTimeout(lastTimeout);
+      }
+      lastTimeout = window.setTimeout(function() {
+        fun.apply(null, args);
+      }, DEBOUNCE_INTERVAL);
+    };
+  }
+
   window.utils = {
     getRandNum: getRandNum,
     compareArrayObjects: compareArrayObjects,
     getRandElement: getRandElement,
     getShuffledArray: getShuffledArray,
     getRandCutArray: getRandCutArray,
-    insertIntoDom: insertIntoDom
+    insertIntoDom: insertIntoDom,
+    debounce: debounce
   };
 })();
