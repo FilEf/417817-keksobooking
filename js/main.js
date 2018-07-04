@@ -52,9 +52,14 @@
       window.card.addOfferCloseEvtListeners();
     }
   }
+
+  function formSubmitHandler(evt) {
+    window.backend.upload(new FormData(evt.target), xhrSuccessUpLoadHandler, xhrErrorHandler);
+  }
+
   window.mainPin.setMouseUpCallback(tryLoad);
   window.map.setContainerListener(pinClickHandler);
   window.form.setListenerToReset(resetPage);
-  window.form.getSuccessErrorFunctions(xhrSuccessUpLoadHandler, xhrErrorHandler);
+  window.form.setListenerToSubmit(formSubmitHandler);
 })();
 

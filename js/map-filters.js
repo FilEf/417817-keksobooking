@@ -30,7 +30,6 @@
     }
   };
 
-
   function findSameHouseType(object) {
     return object.offer.type === selects.type.value || selects.type.value === DEFAULT_FILTER_VALUE;
   }
@@ -48,8 +47,8 @@
     return object.offer.guests === +selects.capacity.value || selects.capacity.value === DEFAULT_FILTER_VALUE;
   }
   function findSameFeatures(object) {
-    Array.from(featureCheckboxes).some(function (feature) {
-      return feature.checked && object.offer.features.includes(feature.value);
+    return Array.from(featureCheckboxes).every(function (feature) {
+      return ((!feature.checked) || feature.checked && object.offer.features.includes(feature.value));
     });
   }
 
@@ -57,8 +56,8 @@
     return (findSameHouseType(object) &&
            findSamePrice(object) &&
            findSameRoomsNumbers(object) &&
-           findSameCapacity(object) /* &&
-           findSameFeatures(object)*/);
+           findSameCapacity(object) &&
+           findSameFeatures(object));
   }
 
   function applyFilter(objects) {
@@ -73,7 +72,7 @@
 
   function setFilter(objects, updateMap) {
     window.card.deleteOfferFromDom();
-    filteredOffers = applyFilter(objects).slice();
+    filteredOffers = applyFilter(objects);
     updateMap(filteredOffers);
   }
 
@@ -83,7 +82,6 @@
       setFilter(offers, onFilterChange);
     }));
   }
-
   filterContainer.addEventListener('change', window.utils.debounce(function () {
     setFilter(offers, onFilterChange);
   }));
