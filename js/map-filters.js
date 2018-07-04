@@ -8,6 +8,7 @@
   };
   var offers = [];
   var filteredOffers = [];
+  var onFilterChange = null;
   var filterContainer = document.querySelector('.map__filters');
   var selects = {
     type: filterContainer.querySelector('#housing-type'),
@@ -34,7 +35,11 @@
     return object.offer.type === selects.type.value || selects.type.value === DEFAULT_FILTER_VALUE;
   }
   function findSamePrice(object) {
-    return priceFilters[selects.price.value](object) || selects.price.value === DEFAULT_FILTER_VALUE;
+    var priceFilter = priceFilters[selects.price.value];
+    if (priceFilter) {
+      return priceFilter(object);
+    }
+    return true;
   }
   function findSameRoomsNumbers(object) {
     return object.offer.rooms === +selects.room.value || selects.room.value === DEFAULT_FILTER_VALUE;
@@ -47,32 +52,43 @@
       return feature.checked && object.offer.features.includes(feature.value);
     });
   }
-  function getData(objects) {
-    offers = objects;
-  }
+
   function startFilter(object) {
     return (findSameHouseType(object) &&
            findSamePrice(object) &&
            findSameRoomsNumbers(object) &&
-           findSameCapacity(object) &&
-           findSameFeatures(object));
+           findSameCapacity(object) /* &&
+           findSameFeatures(object)*/);
   }
 
   function applyFilter(objects) {
-    filteredOffers = objects.filter(startFilter);
+    return objects.filter(startFilter);
   }
 
-  function updateMap() {
-    applyFilter(offers);
-    console.log(filteredOffers);
-    window.pins.deleteAll();
-    if (filteredOffers) {
-      window.utils.insertIntoDom(window.map.getPinsContainer(), window.pins.makeFragment(filteredOffers));
-    }
+  function startFilterFirstTime(objects, callback) {
+    offers = objects;
+    onFilterChange = callback;
+    setFilter(offers, onFilterChange);
   }
 
-  filterContainer.addEventListener('change', window.utils.debounce(updateMap));
+  function setFilter(objects, updateMap) {
+    window.card.deleteOfferFromDom();
+    filteredOffers = applyFilter(objects).slice();
+    updateMap(filteredOffers);
+  }
+
+  function deleteFilter() {
+    filterContainer.reset();
+    filterContainer.removeEventListener('change', window.utils.debounce(function () {
+      setFilter(offers, onFilterChange);
+    }));
+  }
+
+  filterContainer.addEventListener('change', window.utils.debounce(function () {
+    setFilter(offers, onFilterChange);
+  }));
   window.mapFilters = {
-    getData: getData
+    startFirstTime: startFilterFirstTime,
+    delete: deleteFilter
   };
 })();

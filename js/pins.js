@@ -6,9 +6,9 @@
   var PIN_NUMBER = 5;
   var pins = [];
   var mapPinTemplate = document.querySelector('template').content.querySelector('.map__pin');
+  var mapPinContainer = window.map.getPinsContainer();
 
   // функция создания указателя
-
   function makePin(arrayObject, i) {
     var pin = mapPinTemplate.cloneNode(true);
     pin.style.left = arrayObject.location.x - PIN_WIDTH / 2 + 'px';
@@ -22,7 +22,7 @@
   // функция создания фрагмента с указателями
   function makePinsFragment(array) {
     var pinsFragment = document.createDocumentFragment();
-    for (var i = 0; i < PIN_NUMBER; i++) {
+    for (var i = 0; i < array.length && i < PIN_NUMBER; i++) {
       var newPin = makePin(array[i], i);
       pins.push(newPin);
       pinsFragment.appendChild(newPin);
@@ -40,8 +40,23 @@
     pins = [];
   }
 
+  // функция проставления класса active у нажатого пина
+  function setPinActive(element) {
+    element.classList.add('map__pin--active');
+  }
+
+  // функция удаления класса active у всех пинов
+  function setPinDisable() {
+    var activePin = mapPinContainer.querySelector('.map__pin--active');
+    if (activePin) {
+      activePin.classList.remove('map__pin--active');
+    }
+  }
+
   window.pins = {
     makeFragment: makePinsFragment,
-    deleteAll: deletePins
+    deleteAll: deletePins,
+    setActive: setPinActive,
+    setDisable: setPinDisable
   };
 })();

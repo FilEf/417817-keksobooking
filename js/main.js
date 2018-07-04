@@ -5,40 +5,34 @@
 
   // функция обработчик нажатия на кнопку reset
   function resetPage() {
+    window.mapFilters.delete();
     window.pins.deleteAll();
     window.card.closeOffer();
     window.map.setDisabled();
     window.mainPin.setCoords();
     window.mainPin.setMouseUpListener();
+    window.form.inputAddress(window.mainPin.getCoords());
   }
 
   // функция-обработчик успешной загрузки данных
   function xhrSuccessLoadHandler(objects) {
     offers = objects;
     window.map.setEnabled();
-    window.utils.insertIntoDom(window.map.getPinsContainer(), window.pins.makeFragment(objects));
+    window.mapFilters.startFirstTime(objects, function updateMap(data) {
+      window.pins.deleteAll();
+      window.utils.insertIntoDom(window.map.getPinsContainer(), window.pins.makeFragment(data));
+      offers = data;
+    });
     window.form.inputAddress(window.mainPin.getCoords());
-    window.mapFilters.getData(objects);
   }
 
   function xhrSuccessUpLoadHandler() {
     resetPage();
-    window.form.showSuccessMessage();
+    window.message.showSuccess();
   }
 
   function xhrErrorHandler(error) {
-    var node = document.createElement('div');
-    node.className = 'error-message';
-    node.style = 'top: 0; left: 0; z-index: 200; width: 100%; height: 100%; background-color: rgba(255, 0, 0, 0.6); vertical-align: middle;';
-    node.style.position = 'fixed';
-    node.style.paddingTop = '500px';
-    node.style.textAlign = 'center';
-    node.style.fontSize = '50px';
-    node.textContent = error;
-    document.body.insertAdjacentElement('afterbegin', node);
-    setTimeout(function () {
-      node.remove();
-    }, 2000);
+    window.message.showError(error);
   }
 
   function tryLoad() {
@@ -52,6 +46,8 @@
       var currentIndex = parseInt(pin.dataset.id, 10);
       window.card.deleteOfferFromDom();
       var currentOffer = window.card.makeOffer(offers[currentIndex]);
+      window.pins.setDisable();
+      window.pins.setActive(pin);
       window.utils.insertIntoDom(window.map.get(), currentOffer);
       window.card.addOfferCloseEvtListeners();
     }

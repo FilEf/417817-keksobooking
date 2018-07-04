@@ -92,12 +92,14 @@
   // функция обработки события нажатия на кнопку закрыть
   function closeBtnPressHandler() {
     closeOffer();
+    window.pins.setDisable();
   }
 
   // функция обработки события нажатия на escape
   function escPressHandler(evt) {
     if (evt.keyCode === ESC_CODE) {
       closeOffer();
+      window.pins.setDisable();
     }
   }
   window.card = {

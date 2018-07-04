@@ -7,7 +7,6 @@
     'house': 5000,
     'palace': 10000
   };
-  var ESC_CODE = 27;
 
   var adForm = document.querySelector('.ad-form');
   var priceInput = adForm.querySelector('#price');
@@ -20,7 +19,6 @@
   var resetButton = adForm.querySelector('.ad-form__reset');
   var addressField = adForm.querySelector('#address');
   var adFormFieldsets = adForm.querySelectorAll('fieldset');
-  var successMessage = document.querySelector('.success');
 
   // функция разблокировки формы
   function setFormEnabled() {
@@ -87,24 +85,7 @@
   function setListenerToReset(callback) {
     resetButton.addEventListener('click', function () {
       callback();
-      inputAddress(window.mainPin.getCoords());
     });
-  }
-
-  // функция закрытия окна с сообщением об успешной загрузке по клику на произвольной области или esc
-  function hideSuccessMessage(evt) {
-    evt.preventDefault();
-    if (evt.keyCode === ESC_CODE || evt.button || evt.which) {
-      successMessage.classList.add('hidden');
-      document.removeEventListener('click', hideSuccessMessage);
-      document.removeEventListener('keydown', hideSuccessMessage);
-    }
-  }
-  // функция показа окна с сообщением об успешной загрузке
-  function showSuccessMessage() {
-    successMessage.classList.remove('hidden');
-    document.addEventListener('click', hideSuccessMessage);
-    document.addEventListener('keydown', hideSuccessMessage);
   }
 
   var onSuccessCallback = null;
@@ -136,7 +117,6 @@
     setFormDisabled: setFormDisabled,
     inputAddress: inputAddress,
     setListenerToReset: setListenerToReset,
-    showSuccessMessage: showSuccessMessage,
     getSuccessErrorFunctions: getSuccessErrorFunctions
   };
 })();
