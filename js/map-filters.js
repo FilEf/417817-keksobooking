@@ -76,15 +76,15 @@
     updateMap(filteredOffers);
   }
 
+  var filterHolder = window.utils.debounce(function () {
+    setFilter(offers, onFilterChange);
+  });
+
   function deleteFilter() {
     filterContainer.reset();
-    filterContainer.removeEventListener('change', window.utils.debounce(function () {
-      setFilter(offers, onFilterChange);
-    }));
+    filterContainer.removeEventListener('change', filterHolder);
   }
-  filterContainer.addEventListener('change', window.utils.debounce(function () {
-    setFilter(offers, onFilterChange);
-  }));
+  filterContainer.addEventListener('change', filterHolder);
   window.mapFilters = {
     startFirstTime: startFilterFirstTime,
     delete: deleteFilter

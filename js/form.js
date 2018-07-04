@@ -17,9 +17,10 @@
   var capacity = adForm.querySelector('#capacity');
   var capacityValues = capacity.querySelectorAll('option');
   var resetButton = adForm.querySelector('.ad-form__reset');
+  var submitButton = adForm.querySelector('.ad-form__submit');
   var addressField = adForm.querySelector('#address');
   var adFormFieldsets = adForm.querySelectorAll('fieldset');
-  var adFormInputs = adForm.querySelectorAll('input');
+  var adFormInputs = adForm.querySelectorAll('input[required]');
 
   // функция разблокировки формы
   function setFormEnabled() {
@@ -84,14 +85,12 @@
   }
 
   function checkValidity() {
-    var valid = true;
     Array.from(adFormInputs).forEach(function (input) {
-      if (input.validity.valid) {
-        input.style.border = '5px solid #ff0000';
-        valid = false;
+      input.style.boxShadow = '';
+      if (input.validity.valueMissing) {
+        input.style.boxShadow = '0 0 15px #ff0000';
       }
     });
-    return valid;
   }
 
   function setListenerToReset(callback) {
@@ -99,18 +98,16 @@
       callback();
     });
   }
-
   function setListenerToSubmit(callback) {
     adForm.addEventListener('submit', function (evt) {
-      if (checkValidity()) {
-        evt.preventDefault();
-        callback(evt);
-      }
+      evt.preventDefault();
+      callback(evt);
     });
   }
 
   // функция запуска обработчиков событий на форме
   function addFormListeners() {
+    submitButton.addEventListener('click', checkValidity);
     typeInput.addEventListener('change', typeInputChangeHandler);
     timein.addEventListener('change', timeinInputChangeHandler);
     timeout.addEventListener('change', timeoutInputChangeHandler);
