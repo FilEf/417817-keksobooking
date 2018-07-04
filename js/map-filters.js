@@ -84,9 +84,13 @@
     filterContainer.reset();
     filterContainer.removeEventListener('change', filterHolder);
   }
-  filterContainer.addEventListener('change', filterHolder);
+  function setFilterHolder() {
+    filterContainer.addEventListener('change', filterHolder);
+  }
+
   window.mapFilters = {
     startFirstTime: startFilterFirstTime,
-    delete: deleteFilter
+    delete: deleteFilter,
+    setHolder: setFilterHolder
   };
 })();
