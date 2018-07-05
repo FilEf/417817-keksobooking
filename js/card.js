@@ -4,6 +4,13 @@
   var PHOTO_WIDTH = 45;
   var PHOTO_HEIGHT = 40;
   var ESC_CODE = 27;
+  var TYPE_RUS =
+    {
+      'palace': 'Дворец',
+      'flat': 'Квартира',
+      'house': 'Дом',
+      'bungalo': 'Бунгало'
+    };
 
   var currentOffer;
   // функция создания фрагмента со списком удобств
@@ -42,7 +49,7 @@
     offer.querySelector('.popup__title').textContent = arrayObject.offer.title;
     offer.querySelector('.popup__text--address').textContent = arrayObject.offer.address;
     offer.querySelector('.popup__text--price').textContent = arrayObject.offer.price + ' ₽/ночь';
-    offer.querySelector('.popup__type').textContent = arrayObject.offer.type;
+    offer.querySelector('.popup__type').textContent = TYPE_RUS[arrayObject.offer.type];
     offer.querySelector('.popup__text--capacity').textContent = arrayObject.offer.rooms + ' комнаты для ' + arrayObject.offer.guests + ' гостей';
     offer.querySelector('.popup__text--time').textContent = 'Заезд после ' + arrayObject.offer.checkin + ', выезд до ' + arrayObject.offer.checkout;
     offer.querySelector('.popup__description').textContent = arrayObject.offer.description;
@@ -85,12 +92,14 @@
   // функция обработки события нажатия на кнопку закрыть
   function closeBtnPressHandler() {
     closeOffer();
+    window.pins.setDisable();
   }
 
   // функция обработки события нажатия на escape
   function escPressHandler(evt) {
     if (evt.keyCode === ESC_CODE) {
       closeOffer();
+      window.pins.setDisable();
     }
   }
   window.card = {

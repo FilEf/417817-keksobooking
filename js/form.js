@@ -7,20 +7,20 @@
     'house': 5000,
     'palace': 10000
   };
-  var ESC_CODE = 27;
 
   var adForm = document.querySelector('.ad-form');
   var priceInput = adForm.querySelector('#price');
   var typeInput = adForm.querySelector('#type');
-  var timein = adForm.querySelector('#timein');
-  var timeout = adForm.querySelector('#timeout');
+  var timeIn = adForm.querySelector('#timein');
+  var timeOut = adForm.querySelector('#timeout');
   var roomNumber = adForm.querySelector('#room_number');
   var capacity = adForm.querySelector('#capacity');
   var capacityValues = capacity.querySelectorAll('option');
   var resetButton = adForm.querySelector('.ad-form__reset');
+  var submitButton = adForm.querySelector('.ad-form__submit');
   var addressField = adForm.querySelector('#address');
   var adFormFieldsets = adForm.querySelectorAll('fieldset');
-  var successMessage = document.querySelector('.success');
+  var adFormInputs = adForm.querySelectorAll('input[required]');
 
   // функция разблокировки формы
   function setFormEnabled() {
@@ -57,17 +57,17 @@
   }
 
   // функция синхронизации времени выезда по времени заезда
-  function timeinInputChangeHandler() {
-    timeout.value = timein.value;
+  function timeInInputChangeHandler() {
+    timeOut.value = timeIn.value;
   }
 
   // функция синхронизации времени заезда по времени выезда
-  function timeoutInputChangeHandler() {
-    timein.value = timeout.value;
+  function timeOutInputChangeHandler() {
+    timeIn.value = timeOut.value;
   }
 
   // функция проставления disabled у невалидных значений
-  function syncronizeCapacityByRoomNumbers(roomValue) {
+  function synchronizeCapacityByRoomNumbers(roomValue) {
     var lastEnabledIndex = null;
     for (var i = 0; i < capacityValues.length; i++) {
       var capacityValue = parseInt(capacityValues[i].value, 10);
@@ -81,50 +81,36 @@
   // функция синхронизации кол-ва комнат с кол-вом мест
   function roomNumberChangeHandler(evt) {
     var roomValue = parseInt(evt.target.value, 10);
-    syncronizeCapacityByRoomNumbers(roomValue);
+    synchronizeCapacityByRoomNumbers(roomValue);
+  }
+
+  function submitButtonClickHandler() {
+    Array.from(adFormInputs).forEach(function (input) {
+      input.style.boxShadow = '';
+      if (input.validity.valueMissing) {
+        input.style.boxShadow = '0 0 15px #ff0000';
+      }
+    });
   }
 
   function setListenerToReset(callback) {
     resetButton.addEventListener('click', function () {
       callback();
-      inputAddress(window.mainPin.getCoords());
     });
   }
-
-  // функция закрытия окна с сообщением об успешной загрузке по клику на произвольной области или esc
-  function hideSuccessMessage(evt) {
-    evt.preventDefault();
-    if (evt.keyCode === ESC_CODE || evt.button || evt.which) {
-      successMessage.classList.add('hidden');
-      document.removeEventListener('click', hideSuccessMessage);
-      document.removeEventListener('keydown', hideSuccessMessage);
-    }
-  }
-  // функция показа окна с сообщением об успешной загрузке
-  function showSuccessMessage() {
-    successMessage.classList.remove('hidden');
-    document.addEventListener('click', hideSuccessMessage);
-    document.addEventListener('keydown', hideSuccessMessage);
-  }
-
-  var onSuccessCallback = null;
-  var onErrorCallback = null;
-
-  function formSubmitHandler() {
-    window.backend.upload(new FormData(adForm), onSuccessCallback, onErrorCallback);
-  }
-
-  function getSuccessErrorFuctions(onSuccess, onError) {
-    onSuccessCallback = onSuccess;
-    onErrorCallback = onError;
+  function setListenerToSubmit(callback) {
+    adForm.addEventListener('submit', function (evt) {
+      evt.preventDefault();
+      callback(evt);
+    });
   }
 
   // функция запуска обработчиков событий на форме
   function addFormListeners() {
-    adForm.addEventListener('submit', formSubmitHandler);
+    submitButton.addEventListener('click', submitButtonClickHandler);
     typeInput.addEventListener('change', typeInputChangeHandler);
-    timein.addEventListener('change', timeinInputChangeHandler);
-    timeout.addEventListener('change', timeoutInputChangeHandler);
+    timeIn.addEventListener('change', timeInInputChangeHandler);
+    timeOut.addEventListener('change', timeOutInputChangeHandler);
     roomNumber.addEventListener('change', roomNumberChangeHandler);
   }
 
@@ -136,7 +122,6 @@
     setFormDisabled: setFormDisabled,
     inputAddress: inputAddress,
     setListenerToReset: setListenerToReset,
-    showSuccessMessage: showSuccessMessage,
-    getSuccessErrorFuctions: getSuccessErrorFuctions
+    setListenerToSubmit: setListenerToSubmit
   };
 })();

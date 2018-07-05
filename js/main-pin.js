@@ -7,7 +7,7 @@
   var MAIN_PIN_HEIGHT = 65;
   var MAIN_PIN_TAIL = 22;
   var LIMITS = {
-    left: 0 - MAIN_PIN_WIDTH / 2,
+    left: -MAIN_PIN_WIDTH / 2,
     top: 130 - (MAIN_PIN_HEIGHT + MAIN_PIN_TAIL),
     right: document.querySelector('body').offsetWidth - MAIN_PIN_WIDTH / 2,
     bottom: 630 - (MAIN_PIN_HEIGHT + MAIN_PIN_TAIL)
@@ -91,6 +91,7 @@
 
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
+    window.mapFilters.setHolder();
   }
 
   var onMouseUpCallback = null;
