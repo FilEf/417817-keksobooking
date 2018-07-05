@@ -11,8 +11,8 @@
   var adForm = document.querySelector('.ad-form');
   var priceInput = adForm.querySelector('#price');
   var typeInput = adForm.querySelector('#type');
-  var timein = adForm.querySelector('#timein');
-  var timeout = adForm.querySelector('#timeout');
+  var timeIn = adForm.querySelector('#timein');
+  var timeOut = adForm.querySelector('#timeout');
   var roomNumber = adForm.querySelector('#room_number');
   var capacity = adForm.querySelector('#capacity');
   var capacityValues = capacity.querySelectorAll('option');
@@ -57,17 +57,17 @@
   }
 
   // функция синхронизации времени выезда по времени заезда
-  function timeinInputChangeHandler() {
-    timeout.value = timein.value;
+  function timeInInputChangeHandler() {
+    timeOut.value = timeIn.value;
   }
 
   // функция синхронизации времени заезда по времени выезда
-  function timeoutInputChangeHandler() {
-    timein.value = timeout.value;
+  function timeOutInputChangeHandler() {
+    timeIn.value = timeOut.value;
   }
 
   // функция проставления disabled у невалидных значений
-  function syncronizeCapacityByRoomNumbers(roomValue) {
+  function synchronizeCapacityByRoomNumbers(roomValue) {
     var lastEnabledIndex = null;
     for (var i = 0; i < capacityValues.length; i++) {
       var capacityValue = parseInt(capacityValues[i].value, 10);
@@ -81,10 +81,10 @@
   // функция синхронизации кол-ва комнат с кол-вом мест
   function roomNumberChangeHandler(evt) {
     var roomValue = parseInt(evt.target.value, 10);
-    syncronizeCapacityByRoomNumbers(roomValue);
+    synchronizeCapacityByRoomNumbers(roomValue);
   }
 
-  function checkValidity() {
+  function submitButtonClickHandler() {
     Array.from(adFormInputs).forEach(function (input) {
       input.style.boxShadow = '';
       if (input.validity.valueMissing) {
@@ -107,10 +107,10 @@
 
   // функция запуска обработчиков событий на форме
   function addFormListeners() {
-    submitButton.addEventListener('click', checkValidity);
+    submitButton.addEventListener('click', submitButtonClickHandler);
     typeInput.addEventListener('change', typeInputChangeHandler);
-    timein.addEventListener('change', timeinInputChangeHandler);
-    timeout.addEventListener('change', timeoutInputChangeHandler);
+    timeIn.addEventListener('change', timeInInputChangeHandler);
+    timeOut.addEventListener('change', timeOutInputChangeHandler);
     roomNumber.addEventListener('change', roomNumberChangeHandler);
   }
 

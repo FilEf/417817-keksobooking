@@ -4,7 +4,7 @@
   var DEBOUNCE_INTERVAL = 500;
 
   // функция-генератор случайных чисел
-  function getRandNum(min, max) {
+  function getRandomNumber(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
@@ -16,15 +16,15 @@
   }
 
   // функция получения рандомного элемента массива
-  function getRandElement(array) {
-    return array[getRandNum(0, array.length - 1)];
+  function getRandomElement(array) {
+    return array[getRandomNumber(0, array.length - 1)];
   }
 
   // функция перемешивания массива
   function getShuffledArray(array) {
     var resultArray = [];
     for (var i = 0; i < array.length; i++) {
-      var randArrayElement = getRandElement(array);
+      var randArrayElement = getRandomElement(array);
       if (!resultArray.some(compareArrayObjects(randArrayElement))) {
         resultArray[i] = randArrayElement;
       } else {
@@ -35,8 +35,8 @@
   }
 
   // функция обрезания массива на рандомную длину
-  function getRandCutArray(array) {
-    return getShuffledArray(array).slice(0, getRandNum(1, array.length - 1));
+  function getRandomCutArray(array) {
+    return getShuffledArray(array).slice(0, getRandomNumber(1, array.length - 1));
   }
 
   // функция добавления элементов в DOM
@@ -60,11 +60,11 @@
   }
 
   window.utils = {
-    getRandNum: getRandNum,
+    getRandomNumber: getRandomNumber,
     compareArrayObjects: compareArrayObjects,
-    getRandElement: getRandElement,
+    getRandomElement: getRandomElement,
     getShuffledArray: getShuffledArray,
-    getRandCutArray: getRandCutArray,
+    getRandomCutArray: getRandomCutArray,
     insertIntoDom: insertIntoDom,
     debounce: debounce
   };

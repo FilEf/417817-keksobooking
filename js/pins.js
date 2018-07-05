@@ -32,11 +32,9 @@
 
   // функция удаления указателей
   function deletePins() {
-    var i = 0;
-    while (i < pins.length) {
-      pins[i].remove();
-      i++;
-    }
+    pins.forEach(function (pin) {
+      pin.remove();
+    });
     pins = [];
   }
 
