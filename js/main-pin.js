@@ -6,7 +6,7 @@
   var MAIN_PIN_WIDTH = 65;
   var MAIN_PIN_HEIGHT = 65;
   var MAIN_PIN_TAIL = 22;
-  var LIMITS = {
+  var Limits = {
     left: -MAIN_PIN_WIDTH / 2,
     top: 130 - (MAIN_PIN_HEIGHT + MAIN_PIN_TAIL),
     right: document.querySelector('body').offsetWidth - MAIN_PIN_WIDTH / 2,
@@ -18,13 +18,13 @@
   function getAddress() {
     if (window.map.isFaded()) {
       return {
-        x: Math.round(mapPinMain.offsetLeft + MAIN_PIN_WIDTH / 2),
-        y: Math.round(mapPinMain.offsetTop + MAIN_PIN_HEIGHT / 2)
+        x: Math.floor(mapPinMain.offsetLeft + MAIN_PIN_WIDTH / 2),
+        y: Math.floor(mapPinMain.offsetTop + MAIN_PIN_HEIGHT / 2)
       };
     } else {
       return {
-        x: Math.round(mapPinMain.offsetLeft + MAIN_PIN_WIDTH / 2),
-        y: Math.round(mapPinMain.offsetTop + MAIN_PIN_HEIGHT + MAIN_PIN_TAIL)
+        x: Math.floor(mapPinMain.offsetLeft + MAIN_PIN_WIDTH / 2),
+        y: Math.floor(mapPinMain.offsetTop + MAIN_PIN_HEIGHT + MAIN_PIN_TAIL)
       };
     }
   }
@@ -43,17 +43,17 @@
       x: x,
       y: y
     };
-    if (newCoords.x < LIMITS.left) {
-      newCoords.x = LIMITS.left;
+    if (newCoords.x < Limits.left) {
+      newCoords.x = Limits.left;
     }
-    if (newCoords.y < LIMITS.top) {
-      newCoords.y = LIMITS.top;
+    if (newCoords.y < Limits.top) {
+      newCoords.y = Limits.top;
     }
-    if (newCoords.x > LIMITS.right) {
-      newCoords.x = LIMITS.right;
+    if (newCoords.x > Limits.right) {
+      newCoords.x = Limits.right;
     }
-    if (newCoords.y > LIMITS.bottom) {
-      newCoords.y = LIMITS.bottom;
+    if (newCoords.y > Limits.bottom) {
+      newCoords.y = Limits.bottom;
     }
     return newCoords;
   }
@@ -66,7 +66,7 @@
     };
     var shift = {};
     // Функция обработки перемещения пина
-    function onMouseMove(moveEvt) {
+    function mouseMoveHandler(moveEvt) {
       moveEvt.preventDefault();
       shift = {
         x: startCoords.x - moveEvt.clientX,
@@ -83,26 +83,26 @@
       setMainPinCoords(newCoords.x, newCoords.y);
     }
     // Функция обработки отпускания пина
-    function onMouseUp(upEvt) {
+    function mouseUpHandler(upEvt) {
       upEvt.preventDefault();
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
+      document.removeEventListener('mousemove', mouseMoveHandler);
+      document.removeEventListener('mouseup', mouseUpHandler);
     }
 
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('mousemove', mouseMoveHandler);
+    document.addEventListener('mouseup', mouseUpHandler);
     window.mapFilters.setHolder();
   }
 
-  var onMouseUpCallback = null;
+  var mouseUpCallbackHandler = null;
 
   function mainPinMouseUpHandler() {
-    onMouseUpCallback();
+    mouseUpCallbackHandler();
     mapPinMain.removeEventListener('mouseup', mainPinMouseUpHandler);
   }
 
   function setMouseUpCallback(callback) {
-    onMouseUpCallback = callback;
+    mouseUpCallbackHandler = callback;
   }
 
   function setMainPinMouseUpListener() {

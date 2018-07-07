@@ -1,13 +1,13 @@
 'use strict';
 
 (function () {
-  var ESC_CODE = 27;
+  var TIMEOUT = 2000;
   var successMessage = document.querySelector('.success');
 
   // функция закрытия окна с сообщением об успешной загрузке по клику на произвольной области или esc
   function hideSuccessMessage(evt) {
     evt.preventDefault();
-    if (evt.keyCode === ESC_CODE || evt.button || evt.which) {
+    if (window.utils.isEscKeyCode(evt) || evt.button || evt.which) {
       successMessage.classList.add('hidden');
       document.removeEventListener('click', hideSuccessMessage);
       document.removeEventListener('keydown', hideSuccessMessage);
@@ -32,7 +32,7 @@
     document.body.insertAdjacentElement('afterbegin', node);
     setTimeout(function () {
       node.remove();
-    }, 2000);
+    }, TIMEOUT);
   }
 
   window.message = {

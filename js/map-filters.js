@@ -8,17 +8,17 @@
   };
   var offers = [];
   var filteredOffers = [];
-  var onFilterChange = null;
+  var filterChangeHandler = null;
   var filterContainer = document.querySelector('.map__filters');
-  var selects = {
+  var Select = {
     type: filterContainer.querySelector('#housing-type'),
     price: filterContainer.querySelector('#housing-price'),
     room: filterContainer.querySelector('#housing-rooms'),
-    capacity: filterContainer.querySelector('#housing-guests'),
+    capacity: filterContainer.querySelector('#housing-guests')
   };
-  var featureCheckboxes = filterContainer.querySelectorAll('.map__checkbox');
+  var featureCheckboxes = Array.from(filterContainer.querySelectorAll('.map__checkbox'));
 
-  var priceFilters = {
+  var PriceFilter = {
     'middle': function (object) {
       return object.offer.price >= Price.MIN && object.offer.price <= Price.MAX;
     },
@@ -31,23 +31,23 @@
   };
 
   function findSameHouseType(object) {
-    return object.offer.type === selects.type.value || selects.type.value === DEFAULT_FILTER_VALUE;
+    return object.offer.type === Select.type.value || Select.type.value === DEFAULT_FILTER_VALUE;
   }
   function findSamePrice(object) {
-    var priceFilter = priceFilters[selects.price.value];
-    if (priceFilter) {
-      return priceFilter(object);
+    var filterMethod = PriceFilter[Select.price.value];
+    if (filterMethod) {
+      return filterMethod(object);
     }
     return true;
   }
   function findSameRoomsNumbers(object) {
-    return object.offer.rooms === +selects.room.value || selects.room.value === DEFAULT_FILTER_VALUE;
+    return object.offer.rooms === +Select.room.value || Select.room.value === DEFAULT_FILTER_VALUE;
   }
   function findSameCapacity(object) {
-    return object.offer.guests === +selects.capacity.value || selects.capacity.value === DEFAULT_FILTER_VALUE;
+    return object.offer.guests === +Select.capacity.value || Select.capacity.value === DEFAULT_FILTER_VALUE;
   }
   function findSameFeatures(object) {
-    return Array.from(featureCheckboxes).every(function (feature) {
+    return featureCheckboxes.every(function (feature) {
       return ((!feature.checked) || feature.checked && object.offer.features.includes(feature.value));
     });
   }
@@ -66,8 +66,8 @@
 
   function startFilterFirstTime(objects, callback) {
     offers = objects;
-    onFilterChange = callback;
-    setFilter(offers, onFilterChange);
+    filterChangeHandler = callback;
+    setFilter(offers, filterChangeHandler);
   }
 
   function setFilter(objects, updateMap) {
@@ -77,7 +77,7 @@
   }
 
   var filterHolder = window.utils.debounce(function () {
-    setFilter(offers, onFilterChange);
+    setFilter(offers, filterChangeHandler);
   });
 
   function deleteFilter() {

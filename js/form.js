@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-  var TYPE_MINPRICE = {
+  var TypeMinPrice = {
     'bungalo': 0,
     'flat': 1000,
     'house': 5000,
@@ -15,27 +15,30 @@
   var timeOut = adForm.querySelector('#timeout');
   var roomNumber = adForm.querySelector('#room_number');
   var capacity = adForm.querySelector('#capacity');
-  var capacityValues = capacity.querySelectorAll('option');
+  var capacityValues = Array.from(capacity.querySelectorAll('option'));
   var resetButton = adForm.querySelector('.ad-form__reset');
   var submitButton = adForm.querySelector('.ad-form__submit');
   var addressField = adForm.querySelector('#address');
-  var adFormFieldsets = adForm.querySelectorAll('fieldset');
-  var adFormInputs = adForm.querySelectorAll('input[required]');
+  var adFormFieldsets = Array.from(adForm.querySelectorAll('fieldset'));
+  var adFormInputs = Array.from(adForm.querySelectorAll('input[required]'));
 
   // функция разблокировки формы
   function setFormEnabled() {
     adForm.classList.remove('ad-form--disabled');
-    for (var i = 0; i < adFormFieldsets.length; i++) {
-      adFormFieldsets[i].removeAttribute('disabled');
-    }
+    adFormFieldsets.forEach(function (fieldset) {
+      fieldset.removeAttribute('disabled');
+    });
   }
 
   // функция блокировки формы
   function setFormDisabled() {
     adForm.classList.add('ad-form--disabled');
-    for (var i = 0; i < adFormFieldsets.length; i++) {
-      adFormFieldsets[i].setAttribute('disabled', '');
-    }
+    adFormFieldsets.forEach(function (fieldset) {
+      fieldset.setAttribute('disabled', '');
+    });
+    removeInputsValidation();
+    setDefaultPricePlaceholder();
+    setDefaultCapacity();
     adForm.reset();
   }
 
@@ -46,7 +49,7 @@
 
   // функция, возвращающая мин. цену в зависимости от типа жилья
   function getMinPriceByType(type) {
-    return TYPE_MINPRICE[type];
+    return TypeMinPrice[type];
   }
 
   // функция обработки события смены типа жилья
@@ -69,12 +72,12 @@
   // функция проставления disabled у невалидных значений
   function synchronizeCapacityByRoomNumbers(roomValue) {
     var lastEnabledIndex = null;
-    for (var i = 0; i < capacityValues.length; i++) {
-      var capacityValue = parseInt(capacityValues[i].value, 10);
+    capacityValues.forEach(function (option, index) {
+      var capacityValue = parseInt(option.value, 10);
       var isDisabled = roomValue !== 100 ? capacityValue === 0 || capacityValue > roomValue : capacityValue !== 0;
-      capacityValues[i].disabled = isDisabled;
-      lastEnabledIndex = isDisabled ? lastEnabledIndex : i;
-    }
+      option.disabled = isDisabled;
+      lastEnabledIndex = isDisabled ? lastEnabledIndex : index;
+    });
     capacity[lastEnabledIndex].selected = true;
   }
 
@@ -84,12 +87,29 @@
     synchronizeCapacityByRoomNumbers(roomValue);
   }
 
-  function submitButtonClickHandler() {
-    Array.from(adFormInputs).forEach(function (input) {
+  function removeInputsValidation() {
+    adFormInputs.forEach(function (input) {
       input.style.boxShadow = '';
-      if (input.validity.valueMissing) {
+    });
+  }
+
+  function submitButtonClickHandler() {
+    removeInputsValidation();
+    adFormInputs.forEach(function (input) {
+      if (!input.validity.valid) {
         input.style.boxShadow = '0 0 15px #ff0000';
       }
+    });
+  }
+
+  function setDefaultPricePlaceholder() {
+    priceInput.setAttribute('placeholder', TypeMinPrice.flat.toString());
+  }
+
+  function setDefaultCapacity() {
+    capacityValues.forEach(function (option) {
+      var capacityValue = parseInt(option.value, 10);
+      option.disabled = capacityValue !== 1;
     });
   }
 

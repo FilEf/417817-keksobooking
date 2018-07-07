@@ -2,6 +2,7 @@
 
 (function () {
   var DEBOUNCE_INTERVAL = 500;
+  var ESC_CODE = 27;
 
   // функция-генератор случайных чисел
   function getRandomNumber(min, max) {
@@ -59,6 +60,11 @@
     };
   }
 
+  // функция обработки нажатия на клавиатуру
+  function isEscKeyCode(evt) {
+    return evt.keyCode === ESC_CODE;
+  }
+
   window.utils = {
     getRandomNumber: getRandomNumber,
     compareArrayObjects: compareArrayObjects,
@@ -66,6 +72,7 @@
     getShuffledArray: getShuffledArray,
     getRandomCutArray: getRandomCutArray,
     insertIntoDom: insertIntoDom,
-    debounce: debounce
+    debounce: debounce,
+    isEscKeyCode: isEscKeyCode
   };
 })();

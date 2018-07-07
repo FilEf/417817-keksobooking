@@ -11,11 +11,12 @@
   // функция создания указателя
   function makePin(arrayObject, i) {
     var pin = mapPinTemplate.cloneNode(true);
+    var pinImg = pin.querySelector('img');
     pin.style.left = arrayObject.location.x - PIN_WIDTH / 2 + 'px';
     pin.style.top = arrayObject.location.y - PIN_HEIGHT + 'px';
     pin.dataset.id = i;
-    pin.querySelector('img').src = arrayObject.author.avatar;
-    pin.querySelector('img').alt = arrayObject.offer.title;
+    pinImg.src = arrayObject.author.avatar;
+    pinImg.alt = arrayObject.offer.title;
     return pin;
   }
 

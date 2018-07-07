@@ -3,27 +3,28 @@
 (function () {
   var URL_LOAD = 'https://js.dump.academy/keksobooking/data';
   var URL_UPLOAD = 'https://js.dump.academy/keksobooking/';
-  var TIMEOUT = 15000;
+  var TIMEOUT = 10000;
+  var SUCCESS = 200;
 
-  function getData(onLoad, onError, url) {
+  function getData(successLoadHandler, errorLoadHandler, url) {
 
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
 
     xhr.addEventListener('load', function () {
-      if (xhr.status === 200) {
-        onLoad(xhr.response);
+      if (xhr.status === SUCCESS) {
+        successLoadHandler(xhr.response);
       } else {
-        onError('Cтатус ответа: : ' + xhr.status + ' ' + xhr.statusText);
+        errorLoadHandler('Cтатус ответа: : ' + xhr.status + ' ' + xhr.statusText);
       }
     });
 
     xhr.addEventListener('error', function () {
-      onError('Произошла ошибка соединения');
+      errorLoadHandler('Произошла ошибка соединения');
     });
 
     xhr.addEventListener('timeout', function () {
-      onError('Запрос не успел выполниться за ' + xhr.timeout / 1000 + 'сек');
+      errorLoadHandler('Запрос не успел выполниться за ' + xhr.timeout / 1000 + 'сек');
     });
 
     xhr.timeout = TIMEOUT;
@@ -32,24 +33,24 @@
     xhr.send();
   }
 
-  function uploadData(data, onUpLoad, onError, url) {
+  function uploadData(data, successUpLoadHandler, errorLoadHandler, url) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
 
     xhr.addEventListener('load', function () {
-      if (xhr.status === 200) {
-        onUpLoad(xhr.response);
+      if (xhr.status === SUCCESS) {
+        successUpLoadHandler(xhr.response);
       } else {
-        onError('Cтатус ответа: : ' + xhr.status + ' ' + xhr.statusText);
+        errorLoadHandler('Cтатус ответа: : ' + xhr.status + ' ' + xhr.statusText);
       }
     });
 
     xhr.addEventListener('error', function () {
-      onError('Произошла ошибка соединения');
+      errorLoadHandler('Произошла ошибка соединения');
     });
 
     xhr.addEventListener('timeout', function () {
-      onError('Запрос не успел выполниться за ' + xhr.timeout / 1000 + 'сек');
+      errorLoadHandler('Запрос не успел выполниться за ' + xhr.timeout / 1000 + 'сек');
     });
 
     xhr.timeout = TIMEOUT;
@@ -58,11 +59,11 @@
     xhr.send(data);
   }
   window.backend = {
-    load: function (onLoad, onError) {
-      getData(onLoad, onError, URL_LOAD);
+    load: function (successLoadHandler, errorLoadHandler) {
+      getData(successLoadHandler, errorLoadHandler, URL_LOAD);
     },
-    upload: function (data, onUpLoad, onError) {
-      uploadData(data, onUpLoad, onError, URL_UPLOAD);
+    upload: function (data, successUpLoadHandler, errorLoadHandler) {
+      uploadData(data, successUpLoadHandler, errorLoadHandler, URL_UPLOAD);
     }
   };
 })();
