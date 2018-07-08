@@ -5,7 +5,6 @@
   var PIN_HEIGHT = 70;
   var pins = [];
   var mapPinTemplate = document.querySelector('template').content.querySelector('.map__pin');
-  var mapPinContainer = window.map.getPinsContainer();
   var activePin;
 
   // функция создания указателя
