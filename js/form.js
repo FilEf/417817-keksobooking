@@ -38,6 +38,7 @@
     });
     removeInputsValidation();
     setDefaultPricePlaceholder();
+    setDefaultMinPrice();
     setDefaultCapacity();
     adForm.reset();
   }
@@ -104,6 +105,10 @@
 
   function setDefaultPricePlaceholder() {
     priceInput.setAttribute('placeholder', TypeMinPrice.flat.toString());
+  }
+
+  function setDefaultMinPrice() {
+    priceInput.setAttribute('min', TypeMinPrice.flat.toString());
   }
 
   function setDefaultCapacity() {

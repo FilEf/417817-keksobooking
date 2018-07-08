@@ -54,7 +54,7 @@
   }
 
   function formSubmitHandler(evt) {
-    window.backend.upload(new FormData(evt.target), xhrSuccessUpLoadHandler, xhrErrorHandler);
+    window.backend.upload(xhrSuccessUpLoadHandler, xhrErrorHandler, new FormData(evt.target));
   }
 
   window.mainPin.setMouseUpCallback(tryLoad);

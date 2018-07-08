@@ -1,6 +1,7 @@
 'use strict';
 
 (function () {
+  var PINS_NUMBER = 5;
   var DEFAULT_FILTER_VALUE = 'any';
   var Price = {
     MIN: 10000,
@@ -61,7 +62,11 @@
   }
 
   function applyFilter(objects) {
-    return objects.filter(startFilter);
+    var resultArray = objects.filter(startFilter);
+    if (resultArray.length > PINS_NUMBER) {
+      return resultArray.slice(0, PINS_NUMBER);
+    }
+    return resultArray;
   }
 
   function startFilterFirstTime(objects, callback) {
